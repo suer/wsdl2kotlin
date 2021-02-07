@@ -10,7 +10,7 @@ class ${wsdl.service.name}(val endpoint : String) : WSDLService {
 """
     wsdl.portTypes.forEach { portType ->
         portType.operations.forEach { operation ->
-            val inputType  = "${wsdl.service.name}_${operation.input.message.removePrefix("tns:")}"
+            val inputType = "${wsdl.service.name}_${operation.input.message.removePrefix("tns:")}"
             val outputType = "${wsdl.service.name}_${operation.output.message.removePrefix("tns:")}"
             kotlin += """
     fun request(parameters : $inputType) : $outputType {
