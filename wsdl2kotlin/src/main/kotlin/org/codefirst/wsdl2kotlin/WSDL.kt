@@ -43,13 +43,119 @@ class WSDLPortType {
     var operations: MutableList<WSDLOperation> = mutableListOf()
 }
 
+@Xml(name = "s:sequence")
+class XSDSequence {
+    @Element
+    var elements: MutableList<XSDElement> = mutableListOf()
+}
+
+@Xml(name = "s:complexType")
+class XSDComplexType {
+    @Element
+    var sequences: MutableList<XSDSequence> = mutableListOf()
+}
+
+@Xml(name = "s:element")
+class XSDElement {
+    @Element
+    var complexType: XSDComplexType? = null
+
+    @Attribute
+    var name: String = ""
+
+    @Attribute
+    var type: String? = null
+
+    @Attribute
+    var minOccurs: Int? = null
+
+    @Attribute
+    var maxOccurs: Int? = null
+
+    fun typeInKotlin(): String? {
+        return when (type) {
+            null -> null
+            else -> {
+                return when (type?.removePrefix("s:")) {
+                    "string" -> "String"
+                    "boolean" -> "Boolean"
+                    "int" -> "Int"
+                    "long" -> "Long"
+                    "dateTime" -> "Date"
+                    "base64Binary" -> "byte[]" // TODO
+                    else -> ""
+                } + when (minOccurs) {
+                    // TODO: array
+                    0 -> "?"
+                    else -> ""
+                }
+            }
+        }
+    }
+}
+
+@Xml(name = "s:schema")
+class XSDSchema {
+    @Element
+    var elements: MutableList<XSDElement> = mutableListOf()
+}
+
+@Xml(name = "wsdl:types")
+class WSDLTypes {
+    @Element
+    lateinit var schema: XSDSchema
+}
+
+@Xml(name = "wsdl:part")
+class WSDLPart {
+    @Attribute
+    var name: String = ""
+
+    @Attribute
+    var element: String? = null
+
+    @Attribute
+    var type: String? = null
+}
+
+@Xml(name = "wsdl:message")
+class WSDLMessage {
+    @Attribute
+    var name: String = ""
+
+    @Element
+    lateinit var part: WSDLPart
+}
+
 @Xml(name = "wsdl:definitions")
 class WSDLDefinitions {
-    @Element(name = "wsdl:service")
+    @Element
     lateinit var service: WSDLService
 
     @Element
+    var messages: MutableList<WSDLMessage> = mutableListOf()
+
+    @Element
     var portTypes: MutableList<WSDLPortType> = mutableListOf()
+
+    @Element
+    lateinit var types: WSDLTypes
+
+    fun findType(message: String): String? {
+        val name = message.removePrefix("tns:")
+        val part = messages.first { it.name == name }.part
+
+        if (part.element == null) {
+            return null
+        }
+
+        val elementName = part.element?.removePrefix("tns:")
+        if (!types.schema.elements.any { it.name == elementName }) {
+            return null
+        }
+
+        return elementName
+    }
 }
 
 class WSDL {
