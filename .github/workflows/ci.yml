@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Run ktlint
+        run: ./gradlew ktlint
+      - name: Run Unit Test
+        run: ./gradlew test
+      - name: Build with Gradle
+        run: ./gradlew build
+      - name: Upload jar files
+        uses: actions/upload-artifact@v2
+        with:
+          name: jar
+          path: |
+            wsdl2kotlin/build/libs/wsdl2kotlin.jar
+            wsdl2kotlin-runtime/build/libs/wsdl2kotlin-runtime.jar
