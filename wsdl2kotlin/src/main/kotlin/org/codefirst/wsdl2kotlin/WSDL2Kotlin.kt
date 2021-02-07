@@ -1,32 +1,28 @@
 package org.codefirst.wsdl2kotlin
 
-import com.tickaroo.tikxml.TikXml
-import com.tickaroo.tikxml.annotation.Attribute
-import com.tickaroo.tikxml.annotation.Element
-import com.tickaroo.tikxml.annotation.Path
-import com.tickaroo.tikxml.annotation.Xml
-import okio.Okio
-import java.io.File
-
-@Xml(name = "wsdl:service")
-class WSDLService {
-    @Attribute
-    var name: String = ""
-}
-
-@Xml(name = "wsdl:definitions")
-class WSDLDefinitions {
-    @Element(name = "wsdl:service")
-    lateinit var service: WSDLService
-}
-
 fun main() {
-    // TODO; from args
+    // TODO: from args
     val path = WSDLDefinitions::class.java.getResource("/tempconvert.wsdl.xml").file
-    println(path)
 
-    val parser: TikXml = TikXml.Builder().exceptionOnUnreadXml(false).build()
-    val buffer = Okio.buffer(Okio.source(File(path)))
-    val wsdl = parser.read<WSDLDefinitions>(buffer, WSDLDefinitions::class.java)
-    println(wsdl.service.name)
+    val wsdl = WSDL.parse(path)
+    var kotlin = """
+class ${wsdl.service.name}(val endpoint : String) : WSDLService {
+"""
+    wsdl.portTypes.forEach { portType ->
+        portType.operations.forEach { operation ->
+            val inputType  = "${wsdl.service.name}_${operation.input.message.removePrefix("tns:")}"
+            val outputType = "${wsdl.service.name}_${operation.output.message.removePrefix("tns:")}"
+            kotlin += """
+    fun request(parameters : $inputType) : $outputType {
+        return requestGeneric<$outputType>(parameters)
+    }
+"""
+        }
+    }
+
+    kotlin += """
+}
+"""
+    // TODO: write to file
+    println(kotlin)
 }
