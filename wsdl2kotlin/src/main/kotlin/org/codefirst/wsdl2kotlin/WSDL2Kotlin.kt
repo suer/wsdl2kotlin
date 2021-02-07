@@ -6,23 +6,43 @@ fun main() {
 
     val wsdl = WSDL.parse(path)
     var kotlin = """
-class ${wsdl.service.name}(val endpoint : String) : WSDLService {
+import org.codefirst.wsdl2kotlin.WSDLService
+
+class ${wsdl.service.name}(val endpoint: String) : WSDLService {
 """
     wsdl.portTypes.forEach { portType ->
         portType.operations.forEach { operation ->
-            val inputType = "${wsdl.service.name}_${operation.input.message.removePrefix("tns:")}"
-            val outputType = "${wsdl.service.name}_${operation.output.message.removePrefix("tns:")}"
-            kotlin += """
-    fun request(parameters : $inputType) : $outputType {
+            val inputType = wsdl.findType(operation.input.message)
+            val outputType = wsdl.findType(operation.output.message)
+            if (inputType != null && outputType != null) {
+                kotlin += """
+    fun request(parameters: $inputType): $outputType {
         return requestGeneric<$outputType>(parameters)
     }
 """
+            }
         }
     }
 
     kotlin += """
 }
 """
+
+    wsdl.types.schema.elements.filter { it.complexType != null }.forEach { element ->
+        kotlin += """
+class ${wsdl.service.name}_${element.name} {"""
+        element.complexType?.sequences?.forEach { sequence ->
+            sequence.elements.forEach { element2 ->
+                kotlin += """
+    var ${element2.name}: ${element2.typeInKotlin()}"""
+            }
+        }
+
+        kotlin += """
+}
+"""
+    }
+
     // TODO: write to file
     println(kotlin)
 }
