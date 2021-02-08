@@ -8,7 +8,7 @@ fun main() {
     var kotlin = """
 import org.codefirst.wsdl2kotlin.WSDLService
 
-class ${wsdl.service.name}(val endpoint: String) : WSDLService {
+class ${wsdl.service.name}(val endpoint: String) : WSDLService() {
 """
     wsdl.portTypes.forEach { portType ->
         portType.operations.forEach { operation ->
@@ -17,7 +17,7 @@ class ${wsdl.service.name}(val endpoint: String) : WSDLService {
             if (inputType != null && outputType != null) {
                 kotlin += """
     fun request(parameters: $inputType): $outputType {
-        return requestGeneric<$outputType>(parameters)
+        return requestGeneric<$inputType, $outputType>(parameters)
     }
 """
             }
@@ -30,16 +30,16 @@ class ${wsdl.service.name}(val endpoint: String) : WSDLService {
 
     wsdl.types.schema.elements.filter { it.complexType != null }.forEach { element ->
         kotlin += """
-class ${wsdl.service.name}_${element.name} {"""
+class ${wsdl.service.name}_${element.name} ("""
         element.complexType?.sequences?.forEach { sequence ->
             sequence.elements.forEach { element2 ->
                 kotlin += """
-    var ${element2.name}: ${element2.typeInKotlin()}"""
+    var ${element2.name}: ${element2.typeInKotlin()},"""
             }
         }
 
         kotlin += """
-}
+)
 """
     }
 
