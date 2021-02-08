@@ -154,7 +154,7 @@ class WSDLDefinitions {
             return null
         }
 
-        return elementName
+        return "${service.name}_$elementName"
     }
 }
 
