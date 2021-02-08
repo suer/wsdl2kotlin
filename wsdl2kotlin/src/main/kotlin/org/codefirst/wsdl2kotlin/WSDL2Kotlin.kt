@@ -7,6 +7,8 @@ fun main() {
     val wsdl = WSDL.parse(path)
     var kotlin = """
 import org.codefirst.wsdl2kotlin.WSDLService
+import org.codefirst.wsdl2kotlin.XMLParam
+import org.codefirst.wsdl2kotlin.XSDType
 
 class ${wsdl.service.name}(val endpoint: String) : WSDLService() {
 """
@@ -39,7 +41,21 @@ class ${wsdl.service.name}_${element.name} ("""
         }
 
         kotlin += """
-)
+) : XSDType() {
+    override fun xmlParams(): Array<XMLParam> {
+        return arrayOf("""
+        element.complexType?.sequences?.forEach { sequence ->
+            sequence.elements.forEach { element2 ->
+                // TODO: tns or empty
+                kotlin += """
+                XMLParam("tns", "${element2.name}", ${element2.name}),
+"""
+            }
+        }
+        kotlin += """
+        )
+    }
+}
 """
     }
 
