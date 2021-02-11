@@ -19,9 +19,15 @@ import org.codefirst.wsdl2kotlin.XSDType
         }
 
         wsdls.forEach { wsdl ->
+            val location = wsdl.service.ports.first { it.address != null }.address?.location
+            val endpoint = location?.substringBeforeLast("/")
+            val path = location?.substringAfterLast("/")
 
             kotlin += """
-class ${wsdl.service.name}(val endpoint: String) : WSDLService() {
+class ${wsdl.service.name} : WSDLService() {
+    override val targetNamespace = "${wsdl.tns}"
+    override var endpoint = "$endpoint"
+    override var path = "$path"
 """
             wsdl.portTypes.forEach { portType ->
                 portType.operations.forEach { operation ->

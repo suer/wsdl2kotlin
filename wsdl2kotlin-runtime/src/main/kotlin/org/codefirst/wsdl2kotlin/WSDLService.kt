@@ -59,14 +59,14 @@ fun Any?.xmlElements(name: String, document: Document): Array<Element> {
     return arrayOf(element)
 }
 
-open class WSDLService(
-//        open val endpoint: String,
-//        var path: String,
-    val targetNamespace: String
+abstract class WSDLService(
     // TODO: Intercepter
 ) {
+    abstract val targetNamespace: String
+    abstract var endpoint: String
+    abstract var path: String
 
-    fun <I : XSDType, O : XSDType> requestGeneric(i: I): O {
+    protected fun <I : XSDType, O : XSDType> requestGeneric(i: I): O {
 
         val soapRequest = i.soapRequest(targetNamespace)
         println(soapRequest.dump())

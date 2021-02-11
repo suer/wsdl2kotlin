@@ -7,10 +7,25 @@ import com.tickaroo.tikxml.annotation.Xml
 import okio.Okio
 import java.io.File
 
+@Xml(name = "soap:address")
+class SOAPAddress {
+    @Attribute
+    var location: String = ""
+}
+
+@Xml(name = "wsdl:port")
+class WSDLPort {
+    @Element
+    var address: SOAPAddress? = null
+}
+
 @Xml(name = "wsdl:service")
 class WSDLService {
     @Attribute
     var name: String = ""
+
+    @Element
+    var ports = mutableListOf<WSDLPort>()
 }
 
 @Xml(name = "wsdl:input")
@@ -154,6 +169,9 @@ class WSDLDefinitions {
 
     @Element
     var portTypes: MutableList<WSDLPortType> = mutableListOf()
+
+    @Attribute(name = "xmlns:tns")
+    var tns: String = ""
 
     @Element
     lateinit var types: WSDLTypes
