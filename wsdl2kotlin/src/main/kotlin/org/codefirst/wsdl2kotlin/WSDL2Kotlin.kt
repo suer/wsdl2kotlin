@@ -10,7 +10,9 @@ import org.codefirst.wsdl2kotlin.XSDType
         val wsdls = mutableListOf<WSDLDefinitions>()
         paths.forEach {
             if (XSD.isXSD(it)) {
-                wsdls.last().types.schema.elements.addAll(XSD.parse(it).elements)
+                val xsd = XSD.parse(it)
+                wsdls.last().types.schema.elements.addAll(xsd.elements)
+                wsdls.last().types.schema.complexTypes.addAll(xsd.complexTypes)
             } else {
                 wsdls.add(WSDL.parse(it))
             }
@@ -38,36 +40,38 @@ class ${wsdl.service.name}(val endpoint: String) : WSDLService() {
             kotlin += """
 }
 """
+            wsdl.types.schema.complexTypes.forEach { complexType ->
+                kotlin += generateType(complexType?.name ?: "", wsdl, complexType, "")
+            }
 
             wsdl.types.schema.elements.filter { it.complexType != null }.forEach { element ->
-                kotlin += """
-class ${wsdl.service.name}_${element.name} ("""
-                element.complexType?.sequences?.forEach { sequence ->
-                    sequence.elements.forEach { element2 ->
-                        kotlin += """
-    var ${element2.name}: ${element2.typeInKotlin()},"""
-                    }
-                }
+                kotlin += generateType(element.name, wsdl, element.complexType, "tns")
+            }
+        }
+        return kotlin
+    }
 
-                kotlin += """
+    private fun generateType(name: String, wsdl: WSDLDefinitions, complexType: XSDComplexType?, namespace: String): String {
+        var kotlin = """
+class ${wsdl.service.name}_$name ("""
+        complexType?.sequence?.elements?.forEach {
+            kotlin += """
+    var ${it.name}: ${it.typeInKotlin(wsdl.service)},"""
+        }
+
+        kotlin += """
 ) : XSDType() {
     override fun xmlParams(): Array<XMLParam> {
         return arrayOf("""
-                element.complexType?.sequences?.forEach { sequence ->
-                    sequence.elements.forEach { element2 ->
-                        // TODO: tns or empty
-                        kotlin += """
-                XMLParam("tns", "${element2.name}", ${element2.name}),
-"""
-                    }
-                }
-                kotlin += """
+        complexType?.sequence?.elements?.forEach {
+            kotlin += """
+                XMLParam("$namespace", "${it.name}", ${it.name}),"""
+        }
+        kotlin += """
         )
     }
 }
 """
-            }
-        }
         return kotlin
     }
 }

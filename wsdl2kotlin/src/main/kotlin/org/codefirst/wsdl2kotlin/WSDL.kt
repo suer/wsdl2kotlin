@@ -51,8 +51,11 @@ class XSDSequence {
 
 @Xml(name = "s:complexType")
 class XSDComplexType {
+    @Attribute
+    var name: String? = null
+
     @Element
-    var sequences: MutableList<XSDSequence> = mutableListOf()
+    var sequence: XSDSequence? = null
 }
 
 @Xml(name = "s:element")
@@ -70,27 +73,38 @@ class XSDElement {
     var minOccurs: Int? = null
 
     @Attribute
-    var maxOccurs: Int? = null
+    var maxOccurs: String? = null
 
-    fun typeInKotlin(): String? {
-        return when (type) {
-            null -> null
-            else -> {
-                return when (type?.removePrefix("s:")) {
-                    "string" -> "String"
-                    "boolean" -> "Boolean"
-                    "int" -> "Int"
-                    "long" -> "Long"
-                    "dateTime" -> "Date"
-                    "base64Binary" -> "byte[]" // TODO
-                    else -> ""
-                } + when (minOccurs) {
-                    // TODO: array
-                    0 -> "?"
-                    else -> ""
-                }
+    fun typeInKotlin(service: WSDLService): String? {
+        if (type == null) {
+            return null
+        }
+
+        var kotlinTypeName = ""
+        if (type?.startsWith("s:") == true) {
+            kotlinTypeName = when (type?.removePrefix("s:")) {
+                "string" -> "String"
+                "boolean" -> "Boolean"
+                "int" -> "Int"
+                "float" -> "Float"
+                "long" -> "Long"
+                "dateTime" -> "Date"
+                "base64Binary" -> "ByteArray"
+                else -> ""
             }
         }
+        if (type?.startsWith("tns:") == true) {
+            kotlinTypeName = service.name + "_" + type?.removePrefix("tns:") ?: ""
+        }
+
+        if (maxOccurs == "unbounded") {
+            return "Array<$kotlinTypeName>"
+        }
+        if (minOccurs == 0) {
+            return "$kotlinTypeName?"
+        }
+
+        return kotlinTypeName
     }
 }
 
@@ -98,6 +112,9 @@ class XSDElement {
 class XSDSchema {
     @Element
     var elements: MutableList<XSDElement> = mutableListOf()
+
+    @Element
+    var complexTypes: MutableList<XSDComplexType> = mutableListOf()
 }
 
 @Xml(name = "wsdl:types")
