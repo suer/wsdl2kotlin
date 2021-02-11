@@ -60,11 +60,11 @@ fun Any?.xmlElements(name: String, document: Document): Array<Element> {
 }
 
 abstract class WSDLService(
-//        open val endpoint: String,
-//        var path: String,
     // TODO: Intercepter
 ) {
     abstract val targetNamespace: String
+    abstract var endpoint: String
+    abstract var path: String
 
     fun <I : XSDType, O : XSDType> requestGeneric(i: I): O {
 
