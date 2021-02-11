@@ -66,7 +66,7 @@ abstract class WSDLService(
     abstract var endpoint: String
     abstract var path: String
 
-    fun <I : XSDType, O : XSDType> requestGeneric(i: I): O {
+    protected fun <I : XSDType, O : XSDType> requestGeneric(i: I): O {
 
         val soapRequest = i.soapRequest(targetNamespace)
         println(soapRequest.dump())
