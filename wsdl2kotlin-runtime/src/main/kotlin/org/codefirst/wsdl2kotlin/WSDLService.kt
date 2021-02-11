@@ -1,5 +1,9 @@
 package org.codefirst.wsdl2kotlin
 
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import java.io.StringWriter
@@ -69,7 +73,16 @@ abstract class WSDLService(
     protected fun <I : XSDType, O : XSDType> requestGeneric(i: I): O {
 
         val soapRequest = i.soapRequest(targetNamespace)
-        println(soapRequest.dump())
+        println(soapRequest.dump()) // TODO: remove this line
+
+        val request = Request.Builder()
+            .url(endpoint + "/" + path)
+            .post(soapRequest.dump().toRequestBody("text/xml".toMediaTypeOrNull()))
+            .build()
+        val client = OkHttpClient.Builder().build()
+        val response = client.newCall(request).execute()
+
+        println(response.body?.string()) // TODO: remove this line
 
         // TODO
 
@@ -86,6 +99,6 @@ fun Document.dump(): String {
 }
 
 // fun main() {
-//    val req = TempConvert_FahrenheitToCelsius("abc")
-//    val res = TempConvert("").request(req)
+//    val req = TempConvert_FahrenheitToCelsius("100")
+//    val res = TempConvert().also { it.endpoint = "https://www.w3schools.com/xml" }.request(req)
 // }
