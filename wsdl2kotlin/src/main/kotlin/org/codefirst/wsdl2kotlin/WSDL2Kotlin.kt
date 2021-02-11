@@ -7,7 +7,16 @@ import org.codefirst.wsdl2kotlin.WSDLService
 import org.codefirst.wsdl2kotlin.XMLParam
 import org.codefirst.wsdl2kotlin.XSDType
 """
-        paths.map { WSDL.parse(it) }.forEach { wsdl ->
+        val wsdls = mutableListOf<WSDLDefinitions>()
+        paths.forEach {
+            if (XSD.isXSD(it)) {
+                wsdls.last().types.schema.elements.addAll(XSD.parse(it).elements)
+            } else {
+                wsdls.add(WSDL.parse(it))
+            }
+        }
+
+        wsdls.forEach { wsdl ->
 
             kotlin += """
 class ${wsdl.service.name}(val endpoint: String) : WSDLService() {
