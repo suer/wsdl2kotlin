@@ -9,11 +9,10 @@ import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 
-
 data class XMLParam(
-        val namespace: String,
-        val name: String,
-        val value: Any?
+    val namespace: String,
+    val name: String,
+    val value: Any?
 )
 
 abstract class XSDType {
@@ -35,12 +34,12 @@ abstract class XSDType {
         envelopeElement.appendChild(bodyElement)
 
         xmlElements("tns:${this.javaClass.simpleName.split('_').last()}", document)
-                .forEach { bodyElement.appendChild(it) }
+            .forEach { bodyElement.appendChild(it) }
 
         return document
     }
 
-    fun xmlElements(name: String, document: Document) : Array<Element> {
+    fun xmlElements(name: String, document: Document): Array<Element> {
         val typeElement = document.createElement(name)
 
         xmlParams().forEach() { param ->
@@ -54,7 +53,7 @@ abstract class XSDType {
     }
 }
 
-fun Any?.xmlElements(name: String, document: Document) : Array<Element> {
+fun Any?.xmlElements(name: String, document: Document): Array<Element> {
     val element = document.createElement(name)
     element.textContent = this.toString() // TODO: process by Type
     return arrayOf(element)
@@ -63,7 +62,7 @@ fun Any?.xmlElements(name: String, document: Document) : Array<Element> {
 open class WSDLService(
 //        open val endpoint: String,
 //        var path: String,
-        val targetNamespace: String
+    val targetNamespace: String
     // TODO: Intercepter
 ) {
 
@@ -78,7 +77,7 @@ open class WSDLService(
     }
 }
 
-fun Document.dump() : String {
+fun Document.dump(): String {
     val writer = StringWriter()
     val transformer = TransformerFactory.newInstance().newTransformer()
     transformer.setOutputProperty(OutputKeys.INDENT, "yes")
@@ -86,7 +85,7 @@ fun Document.dump() : String {
     return writer.toString()
 }
 
-//fun main() {
+// fun main() {
 //    val req = TempConvert_FahrenheitToCelsius("abc")
 //    val res = TempConvert("").request(req)
-//}
+// }
