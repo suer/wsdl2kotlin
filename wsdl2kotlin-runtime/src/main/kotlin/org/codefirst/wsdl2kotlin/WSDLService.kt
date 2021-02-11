@@ -59,12 +59,12 @@ fun Any?.xmlElements(name: String, document: Document): Array<Element> {
     return arrayOf(element)
 }
 
-open class WSDLService(
+abstract class WSDLService(
 //        open val endpoint: String,
 //        var path: String,
-    val targetNamespace: String
     // TODO: Intercepter
 ) {
+    abstract val targetNamespace: String
 
     fun <I : XSDType, O : XSDType> requestGeneric(i: I): O {
 

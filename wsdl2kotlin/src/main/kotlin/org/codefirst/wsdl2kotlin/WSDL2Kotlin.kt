@@ -22,6 +22,7 @@ import org.codefirst.wsdl2kotlin.XSDType
 
             kotlin += """
 class ${wsdl.service.name}(val endpoint: String) : WSDLService() {
+    override val targetNamespace = "${wsdl.tns}"
 """
             wsdl.portTypes.forEach { portType ->
                 portType.operations.forEach { operation ->

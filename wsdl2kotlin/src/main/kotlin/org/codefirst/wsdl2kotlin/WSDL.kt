@@ -155,6 +155,9 @@ class WSDLDefinitions {
     @Element
     var portTypes: MutableList<WSDLPortType> = mutableListOf()
 
+    @Attribute(name = "xmlns:tns")
+    var tns: String = ""
+
     @Element
     lateinit var types: WSDLTypes
 
