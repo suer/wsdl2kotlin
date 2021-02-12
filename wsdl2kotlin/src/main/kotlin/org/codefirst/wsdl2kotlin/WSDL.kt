@@ -90,6 +90,16 @@ class XSDElement {
     @Attribute
     var maxOccurs: String? = null
 
+    val safeName: String?
+        get() {
+            // https://kotlinlang.org/docs/keyword-reference.html#soft-keywords
+            val keywords = arrayListOf("return", "operator", "var", "val", "out")
+            if (keywords.contains(name)) {
+                return "`$name`"
+            }
+            return name
+        }
+
     fun typeInKotlin(service: WSDLService): String? {
         val kotlinTypeName = baseTypeInKotlin(service)
 
