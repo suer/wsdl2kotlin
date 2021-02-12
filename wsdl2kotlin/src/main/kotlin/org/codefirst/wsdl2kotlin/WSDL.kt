@@ -132,24 +132,21 @@ class XSDElement {
             return null
         }
 
-        var kotlinTypeName = ""
-        if (type?.startsWith("s:") == true) {
-            kotlinTypeName = when (type?.removePrefix("s:")) {
-                "string" -> "String"
-                "boolean" -> "Boolean"
-                "byte" -> "Byte"
-                "int" -> "Int"
-                "float" -> "Float"
-                "long" -> "Long"
-                "dateTime" -> "java.util.Date"
-                "base64Binary" -> "ByteArray"
-                else -> ""
-            }
-        }
         if (type?.startsWith("tns:") == true) {
-            kotlinTypeName = service.name + "_" + type?.removePrefix("tns:") ?: ""
+            return service.name + "_" + type?.removePrefix("tns:") ?: ""
         }
-        return kotlinTypeName
+
+        return when (type?.substringAfterLast(":")) {
+            "string" -> "String"
+            "boolean" -> "Boolean"
+            "byte" -> "Byte"
+            "int" -> "Int"
+            "float" -> "Float"
+            "long" -> "Long"
+            "dateTime" -> "java.util.Date"
+            "base64Binary" -> "ByteArray"
+            else -> ""
+        }
     }
 }
 
