@@ -7,6 +7,8 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import java.io.StringWriter
+import java.text.SimpleDateFormat
+import java.util.Date
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
@@ -18,6 +20,8 @@ data class XMLParam(
     val name: String,
     val value: Any?
 )
+
+const val DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssX:00"
 
 abstract class XSDType {
     abstract fun xmlParams(): Array<XMLParam>
@@ -61,6 +65,11 @@ abstract class XSDType {
     protected inline fun <reified O> readSOAPEnvelopeField(bodyElement: Element, name: String): O {
         return when (O::class.java.name) {
             "java.lang.String" -> bodyElement.getElementsByTagName(name).item(0).textContent
+            "java.lang.Boolean" -> bodyElement.getElementsByTagName(name).item(0).textContent.equals("true", ignoreCase = true)
+            "java.lang.Integer" -> bodyElement.getElementsByTagName(name).item(0).textContent.toInt()
+            "java.lang.Float" -> bodyElement.getElementsByTagName(name).item(0).textContent.toFloat()
+            "java.lang.Long" -> bodyElement.getElementsByTagName(name).item(0).textContent.toLong()
+            "java.util.Date" -> SimpleDateFormat(DATETIME_FORMAT).parse(bodyElement.getElementsByTagName(name).item(0).textContent)
             // TODO: process by Type
             else -> null
         } as O
@@ -69,7 +78,11 @@ abstract class XSDType {
 
 fun Any?.xmlElements(name: String, document: Document): Array<Element> {
     val element = document.createElement(name)
-    element.textContent = this.toString() // TODO: process by Type
+    when (this) {
+        is Date -> element.textContent = SimpleDateFormat(DATETIME_FORMAT).format(this)
+        else -> element.textContent = this.toString() // TODO: process by Type
+    }
+
     return arrayOf(element)
 }
 
