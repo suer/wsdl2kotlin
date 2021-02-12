@@ -55,6 +55,16 @@ abstract class XSDType {
 
         return arrayOf(typeElement)
     }
+
+    abstract fun readSOAPEnvelope(bodyElement: Element)
+
+    protected inline fun <reified O> readSOAPEnvelopeField(bodyElement: Element, name: String): O {
+        return when (O::class.java.name) {
+            "java.lang.String" -> bodyElement.getElementsByTagName(name).item(0).textContent
+            // TODO: process by Type
+            else -> null
+        } as O
+    }
 }
 
 fun Any?.xmlElements(name: String, document: Document): Array<Element> {
@@ -70,7 +80,7 @@ abstract class WSDLService(
     abstract var endpoint: String
     abstract var path: String
 
-    protected fun <I : XSDType, O : XSDType> requestGeneric(i: I): O {
+    protected inline fun <I : XSDType, reified O : XSDType> requestGeneric(i: I): O {
 
         val soapRequest = i.soapRequest(targetNamespace)
         println(soapRequest.dump()) // TODO: remove this line
@@ -82,11 +92,18 @@ abstract class WSDLService(
         val client = OkHttpClient.Builder().build()
         val response = client.newCall(request).execute()
 
-        println(response.body?.string()) // TODO: remove this line
+        val responseBody = response.body?.string()
+        println(responseBody) // TODO: remove this line
 
-        // TODO
+        val factory = DocumentBuilderFactory.newInstance()
+        factory.isNamespaceAware = true
+        val builder = factory.newDocumentBuilder()
+        val document = builder.parse(responseBody?.byteInputStream())
+        var bodyElement = document.getElementsByTagNameNS("http://schemas.xmlsoap.org/soap/envelope/", "Body").item(0) as Element
 
-        return "" as O
+        val o = O::class.java.newInstance()
+        o.readSOAPEnvelope(bodyElement)
+        return o
     }
 }
 
@@ -99,6 +116,8 @@ fun Document.dump(): String {
 }
 
 // fun main() {
-//    val req = TempConvert_FahrenheitToCelsius("100")
+//    val req = TempConvert_FahrenheitToCelsius()
+//    req.Fahrenheit = "100"
 //    val res = TempConvert().also { it.endpoint = "https://www.w3schools.com/xml" }.request(req)
+//    println(res.FahrenheitToCelsiusResult)
 // }
