@@ -59,14 +59,14 @@ class ${wsdl.service.name} : WSDLService() {
 
     private fun generateType(name: String, wsdl: WSDLDefinitions, complexType: XSDComplexType?, namespace: String): String {
         var kotlin = """
-class ${wsdl.service.name}_$name ("""
+class ${wsdl.service.name}_$name : XSDType() {"""
         complexType?.sequence?.elements?.forEach {
             kotlin += """
-    var ${it.name}: ${it.typeInKotlin(wsdl.service)},"""
+    var ${it.name}: ${it.typeInKotlin(wsdl.service)} = ${it.initialValue(wsdl.service)}"""
         }
 
         kotlin += """
-) : XSDType() {
+
     override fun xmlParams(): Array<XMLParam> {
         return arrayOf("""
         complexType?.sequence?.elements?.forEach {

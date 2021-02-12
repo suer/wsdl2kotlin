@@ -91,6 +91,42 @@ class XSDElement {
     var maxOccurs: String? = null
 
     fun typeInKotlin(service: WSDLService): String? {
+        val kotlinTypeName = baseTypeInKotlin(service)
+
+        if (maxOccurs == "unbounded") {
+            return "Array<$kotlinTypeName>"
+        }
+        if (minOccurs == 0) {
+            return "$kotlinTypeName?"
+        }
+
+        return kotlinTypeName
+    }
+
+    fun initialValue(service: WSDLService): String {
+        val kotlinTypeName = baseTypeInKotlin(service)
+
+        if (maxOccurs == "unbounded") {
+            return "emptyArray<$kotlinTypeName>()"
+        }
+
+        if (minOccurs == 0) {
+            return "null"
+        }
+
+        return when (kotlinTypeName) {
+            "String" -> "\"\""
+            "Boolean" -> "false"
+            "Int" -> "0"
+            "Float" -> "0F"
+            "Long" -> "0L"
+            "Date" -> "java.util.Date()"
+            "ByteArray" -> "ByteArray(0)"
+            else -> "$kotlinTypeName()"
+        }
+    }
+
+    private fun baseTypeInKotlin(service: WSDLService): String? {
         if (type == null) {
             return null
         }
@@ -103,7 +139,7 @@ class XSDElement {
                 "int" -> "Int"
                 "float" -> "Float"
                 "long" -> "Long"
-                "dateTime" -> "Date"
+                "dateTime" -> "java.util.Date"
                 "base64Binary" -> "ByteArray"
                 else -> ""
             }
@@ -111,14 +147,6 @@ class XSDElement {
         if (type?.startsWith("tns:") == true) {
             kotlinTypeName = service.name + "_" + type?.removePrefix("tns:") ?: ""
         }
-
-        if (maxOccurs == "unbounded") {
-            return "Array<$kotlinTypeName>"
-        }
-        if (minOccurs == 0) {
-            return "$kotlinTypeName?"
-        }
-
         return kotlinTypeName
     }
 }
