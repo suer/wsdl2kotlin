@@ -6,6 +6,7 @@ class WSDL2Kotlin() {
 import org.codefirst.wsdl2kotlin.WSDLService
 import org.codefirst.wsdl2kotlin.XMLParam
 import org.codefirst.wsdl2kotlin.XSDType
+import org.w3c.dom.Element
 """
         val wsdls = mutableListOf<WSDLDefinitions>()
         paths.forEach {
@@ -75,6 +76,14 @@ class ${wsdl.service.name}_$name : XSDType() {"""
         }
         kotlin += """
         )
+    }
+
+    override fun readSOAPEnvelope(bodyElement: Element) {"""
+        complexType?.sequence?.elements?.forEach {
+            kotlin += """
+        ${it.name} = readSOAPEnvelopeField<${it.typeInKotlin((wsdl.service))}>(bodyElement, "${it.name}")"""
+        }
+        kotlin += """
     }
 }
 """

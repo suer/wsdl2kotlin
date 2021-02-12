@@ -55,6 +55,16 @@ abstract class XSDType {
 
         return arrayOf(typeElement)
     }
+
+    abstract fun readSOAPEnvelope(bodyElement: Element)
+
+    protected inline fun <reified O> readSOAPEnvelopeField(bodyElement: Element, name: String): O {
+        return when (O::class.java) {
+            String.javaClass -> bodyElement.getElementsByTagName(name).item(0).textContent
+            // TODO: process by Type
+            else -> null
+        } as O
+    }
 }
 
 fun Any?.xmlElements(name: String, document: Document): Array<Element> {
@@ -70,7 +80,7 @@ abstract class WSDLService(
     abstract var endpoint: String
     abstract var path: String
 
-    protected fun <I : XSDType, O : XSDType> requestGeneric(i: I): O {
+    protected inline fun <I : XSDType, reified O : XSDType> requestGeneric(i: I): O {
 
         val soapRequest = i.soapRequest(targetNamespace)
         println(soapRequest.dump()) // TODO: remove this line
