@@ -117,6 +117,7 @@ class XSDElement {
         return when (kotlinTypeName) {
             "String" -> "\"\""
             "Boolean" -> "false"
+            "Byte" -> "0"
             "Int" -> "0"
             "Float" -> "0F"
             "Long" -> "0L"
@@ -136,6 +137,7 @@ class XSDElement {
             kotlinTypeName = when (type?.removePrefix("s:")) {
                 "string" -> "String"
                 "boolean" -> "Boolean"
+                "byte" -> "Byte"
                 "int" -> "Int"
                 "float" -> "Float"
                 "long" -> "Long"
