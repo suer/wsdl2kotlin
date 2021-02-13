@@ -62,14 +62,14 @@ abstract class XSDType {
 
     abstract fun readSOAPEnvelope(bodyElement: Element)
 
-    protected inline fun <reified O> readSOAPEnvelopeField(bodyElement: Element, name: String): O {
-        return when (O::class.java.name) {
-            "java.lang.String" -> bodyElement.getElementsByTagName(name).item(0).textContent
-            "java.lang.Boolean" -> bodyElement.getElementsByTagName(name).item(0).textContent.equals("true", ignoreCase = true)
-            "java.lang.Integer" -> bodyElement.getElementsByTagName(name).item(0).textContent.toInt()
-            "java.lang.Float" -> bodyElement.getElementsByTagName(name).item(0).textContent.toFloat()
-            "java.lang.Long" -> bodyElement.getElementsByTagName(name).item(0).textContent.toLong()
-            "java.util.Date" -> SimpleDateFormat(DATETIME_FORMAT).parse(bodyElement.getElementsByTagName(name).item(0).textContent)
+    protected inline fun <reified O> readSOAPEnvelopeField(bodyElement: Element, name: String, field: Any?): O {
+        return when (field) {
+            is String -> bodyElement.getElementsByTagName(name).item(0).textContent
+            is Boolean -> bodyElement.getElementsByTagName(name).item(0).textContent.equals("true", ignoreCase = true)
+            is Integer -> bodyElement.getElementsByTagName(name).item(0).textContent.toInt()
+            is Float -> bodyElement.getElementsByTagName(name).item(0).textContent.toFloat()
+            is Long -> bodyElement.getElementsByTagName(name).item(0).textContent.toLong()
+            is java.util.Date -> SimpleDateFormat(DATETIME_FORMAT).parse(bodyElement.getElementsByTagName(name).item(0).textContent)
             // TODO: process by Type
             else -> null
         } as O
