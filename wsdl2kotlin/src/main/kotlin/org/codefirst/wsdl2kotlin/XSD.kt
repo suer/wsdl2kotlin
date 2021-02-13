@@ -1,15 +1,15 @@
 package org.codefirst.wsdl2kotlin
 
-import com.tickaroo.tikxml.TikXml
-import okio.Okio
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import java.io.File
 
 class XSD {
     companion object {
         fun parse(path: String): XSDSchema {
-            val parser: TikXml = TikXml.Builder().exceptionOnUnreadXml(false).build()
-            val buffer = Okio.buffer(Okio.source(File(path)))
-            return parser.read<XSDSchema>(buffer, XSDSchema::class.java)
+            val xmlMapper = XmlMapper()
+            xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            return xmlMapper.readValue(File(path), XSDSchema::class.java)
         }
 
         fun isXSD(path: String): Boolean {

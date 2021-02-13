@@ -1,93 +1,81 @@
 package org.codefirst.wsdl2kotlin
 
-import com.tickaroo.tikxml.TikXml
-import com.tickaroo.tikxml.annotation.Attribute
-import com.tickaroo.tikxml.annotation.Element
-import com.tickaroo.tikxml.annotation.Xml
-import okio.Okio
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.dataformat.xml.XmlMapper
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement
 import java.io.File
 
-@Xml(name = "soap:address")
 class SOAPAddress {
-    @Attribute
+    @JacksonXmlProperty(isAttribute = true)
     var location: String = ""
 }
 
-@Xml(name = "wsdl:port")
 class WSDLPort {
-    @Element
     var address: SOAPAddress? = null
 }
 
-@Xml(name = "wsdl:service")
 class WSDLService {
-    @Attribute
+    @JacksonXmlProperty(isAttribute = true)
     var name: String = ""
 
-    @Element
+    @JacksonXmlElementWrapper(localName = "port", useWrapping = false)
+    @JacksonXmlProperty(localName = "port")
     var ports = mutableListOf<WSDLPort>()
 }
 
-@Xml(name = "wsdl:input")
 class WSDLInput {
-    @Attribute
+    @JacksonXmlProperty(isAttribute = true)
     var message: String = ""
 }
 
-@Xml(name = "wsdl:output")
 class WSDLOutput {
-    @Attribute
+    @JacksonXmlProperty(isAttribute = true)
     var message: String = ""
 }
 
-@Xml(name = "wsdl:operation")
 class WSDLOperation {
-    @Attribute
+    @JacksonXmlProperty(isAttribute = true)
     var name: String = ""
 
-    @Element
     lateinit var input: WSDLInput
 
-    @Element
     lateinit var output: WSDLOutput
 }
 
-@Xml(name = "wsdl:portType")
 class WSDLPortType {
-    @Element
+    @JacksonXmlElementWrapper(localName = "operation", useWrapping = false)
+    @JacksonXmlProperty(localName = "operation")
     var operations: MutableList<WSDLOperation> = mutableListOf()
 }
 
-@Xml(name = "s:sequence")
 class XSDSequence {
-    @Element
+    @JacksonXmlElementWrapper(localName = "element", useWrapping = false)
+    @JacksonXmlProperty(localName = "element")
     var elements: MutableList<XSDElement> = mutableListOf()
 }
 
-@Xml(name = "s:complexType")
 class XSDComplexType {
-    @Attribute
+    @JacksonXmlProperty(isAttribute = true)
     var name: String? = null
 
-    @Element
     var sequence: XSDSequence? = null
 }
 
-@Xml(name = "s:element")
 class XSDElement {
-    @Element
     var complexType: XSDComplexType? = null
 
-    @Attribute
+    @JacksonXmlProperty(isAttribute = true)
     var name: String = ""
 
-    @Attribute
+    @JacksonXmlProperty(isAttribute = true)
     var type: String? = null
 
-    @Attribute
+    @JacksonXmlProperty(isAttribute = true)
     var minOccurs: Int? = null
 
-    @Attribute
+    @JacksonXmlProperty(isAttribute = true)
     var maxOccurs: String? = null
 
     val safeName: String?
@@ -160,57 +148,62 @@ class XSDElement {
     }
 }
 
-@Xml(name = "s:schema")
+@JacksonXmlRootElement(localName = "schema")
 class XSDSchema {
-    @Element
+    @JacksonXmlElementWrapper(localName = "element", useWrapping = false)
+    @JacksonXmlProperty(localName = "element")
     var elements: MutableList<XSDElement> = mutableListOf()
+        set(value) {
+            // workaround for https://github.com/FasterXML/jackson-dataformat-xml/issues/275
+            elements.addAll(value)
+        }
 
-    @Element
+    @JacksonXmlElementWrapper(localName = "complexType", useWrapping = false)
+    @JacksonXmlProperty(localName = "complexType")
     var complexTypes: MutableList<XSDComplexType> = mutableListOf()
+        set(value) {
+            // workaround for https://github.com/FasterXML/jackson-dataformat-xml/issues/275
+            complexTypes.addAll(value)
+        }
 }
 
-@Xml(name = "wsdl:types")
 class WSDLTypes {
-    @Element
     lateinit var schema: XSDSchema
 }
 
-@Xml(name = "wsdl:part")
 class WSDLPart {
-    @Attribute
+    @JacksonXmlProperty(isAttribute = true)
     var name: String = ""
 
-    @Attribute
+    @JacksonXmlProperty(isAttribute = true)
     var element: String? = null
 
-    @Attribute
+    @JacksonXmlProperty(isAttribute = true)
     var type: String? = null
 }
 
-@Xml(name = "wsdl:message")
 class WSDLMessage {
-    @Attribute
+    @JacksonXmlProperty(isAttribute = true)
     var name: String = ""
 
-    @Element
     lateinit var part: WSDLPart
 }
 
-@Xml(name = "wsdl:definitions")
+@JacksonXmlRootElement(localName = "definitions")
 class WSDLDefinitions {
-    @Element
     lateinit var service: WSDLService
 
-    @Element
+    @JacksonXmlElementWrapper(localName = "message", useWrapping = false)
+    @JacksonXmlProperty(localName = "message")
     var messages: MutableList<WSDLMessage> = mutableListOf()
 
-    @Element
+    @JacksonXmlElementWrapper(localName = "portType", useWrapping = false)
+    @JacksonXmlProperty(localName = "portType")
     var portTypes: MutableList<WSDLPortType> = mutableListOf()
 
-    @Attribute(name = "xmlns:tns")
-    var tns: String = ""
+    @JacksonXmlProperty(isAttribute = true)
+    var targetNamespace: String = ""
 
-    @Element
     lateinit var types: WSDLTypes
 
     fun findType(message: String): String? {
@@ -233,9 +226,9 @@ class WSDLDefinitions {
 class WSDL {
     companion object {
         fun parse(path: String): WSDLDefinitions {
-            val parser: TikXml = TikXml.Builder().exceptionOnUnreadXml(false).build()
-            val buffer = Okio.buffer(Okio.source(File(path)))
-            return parser.read<WSDLDefinitions>(buffer, WSDLDefinitions::class.java)
+            val xmlMapper = XmlMapper()
+            xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            return xmlMapper.readValue(File(path), WSDLDefinitions::class.java)
         }
     }
 }
