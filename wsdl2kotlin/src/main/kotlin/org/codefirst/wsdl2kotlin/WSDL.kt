@@ -153,10 +153,18 @@ class XSDSchema {
     @JacksonXmlElementWrapper(localName = "element", useWrapping = false)
     @JacksonXmlProperty(localName = "element")
     var elements: MutableList<XSDElement> = mutableListOf()
+        set(value) {
+            // workaround for https://github.com/FasterXML/jackson-dataformat-xml/issues/275
+            elements.addAll(value)
+        }
 
     @JacksonXmlElementWrapper(localName = "complexType", useWrapping = false)
     @JacksonXmlProperty(localName = "complexType")
     var complexTypes: MutableList<XSDComplexType> = mutableListOf()
+        set(value) {
+            // workaround for https://github.com/FasterXML/jackson-dataformat-xml/issues/275
+            complexTypes.addAll(value)
+        }
 }
 
 class WSDLTypes {
