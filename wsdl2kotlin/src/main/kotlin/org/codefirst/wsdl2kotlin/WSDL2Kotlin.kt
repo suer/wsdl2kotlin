@@ -26,7 +26,7 @@ import org.w3c.dom.Element
 
             kotlin += """
 class ${wsdl.service.name} : WSDLService() {
-    override val targetNamespace = "${wsdl.tns}"
+    override val targetNamespace = "${wsdl.targetNamespace}"
     override var endpoint = "$endpoint"
     override var path = "$path"
 """
