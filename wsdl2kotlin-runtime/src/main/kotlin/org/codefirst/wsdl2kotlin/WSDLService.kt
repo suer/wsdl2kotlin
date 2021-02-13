@@ -67,7 +67,7 @@ abstract class XSDType {
         return when (field) {
             is String -> item.textContent
             is Boolean -> item.textContent.equals("true", ignoreCase = true)
-            is Integer -> item.textContent.toInt()
+            is Int -> item.textContent.toInt()
             is Float -> item.textContent.toFloat()
             is Long -> item.textContent.toLong()
             is java.util.Date -> SimpleDateFormat(DATETIME_FORMAT).parse(item.textContent)
