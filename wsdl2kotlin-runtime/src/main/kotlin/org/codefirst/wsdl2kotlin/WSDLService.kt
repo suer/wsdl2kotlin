@@ -21,6 +21,8 @@ data class XMLParam(
     val value: Any?
 )
 
+class SOAPFaultException(private val faultString: String) : RuntimeException(faultString)
+
 const val DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssX:00"
 
 abstract class XSDType {
@@ -114,6 +116,12 @@ abstract class WSDLService(
         val builder = factory.newDocumentBuilder()
         val document = builder.parse(responseBody?.byteInputStream())
         var bodyElement = document.getElementsByTagNameNS("http://schemas.xmlsoap.org/soap/envelope/", "Body").item(0) as Element
+
+        val fault = bodyElement.getElementsByTagNameNS("http://schemas.xmlsoap.org/soap/envelope/", "Fault").item(0) as Element
+        if (fault != null) {
+            val faultString = fault.getElementsByTagName("faultstring").item(0).textContent
+            throw SOAPFaultException(faultString)
+        }
 
         val o = O::class.java.newInstance()
         o.readSOAPEnvelope(bodyElement)
