@@ -64,18 +64,64 @@ abstract class XSDType {
 
     abstract fun readSOAPEnvelope(bodyElement: Element)
 
-    protected inline fun <reified O> readSOAPEnvelopeField(bodyElement: Element, name: String, field: Any?): O {
-        val item = bodyElement.getElementsByTagName(name).item(0)
-        return when (field) {
-            is String -> item.textContent
-            is Boolean -> item.textContent.equals("true", ignoreCase = true)
-            is Int -> item.textContent.toInt()
-            is Float -> item.textContent.toFloat()
-            is Long -> item.textContent.toLong()
-            is java.util.Date -> SimpleDateFormat(DATETIME_FORMAT).parse(item.textContent)
-            // TODO: process by Type
-            else -> null
-        } as O
+    protected fun readSOAPEnvelopeField(parentElement: Element, tagName: String, field: String?): String {
+        val item = parentElement.getElementsByTagName(tagName).item(0)
+        return item.textContent
+    }
+
+    protected fun readSOAPEnvelopeField(parentElement: Element, tagName: String, field: Boolean?): Boolean {
+        val item = parentElement.getElementsByTagName(tagName).item(0)
+        return item.textContent.equals("true", ignoreCase = true)
+    }
+
+    protected fun readSOAPEnvelopeField(parentElement: Element, tagName: String, field: Int?): Int {
+        val item = parentElement.getElementsByTagName(tagName).item(0)
+        return item.textContent.toInt()
+    }
+
+    protected fun readSOAPEnvelopeField(parentElement: Element, tagName: String, field: Float?): Float {
+        val item = parentElement.getElementsByTagName(tagName).item(0)
+        return item.textContent.toFloat()
+    }
+
+    protected fun readSOAPEnvelopeField(parentElement: Element, tagName: String, field: Long?): Long {
+        val item = parentElement.getElementsByTagName(tagName).item(0)
+        return item.textContent.toLong()
+    }
+
+    protected fun readSOAPEnvelopeField(parentElement: Element, tagName: String, field: java.util.Date?): java.util.Date {
+        val item = parentElement.getElementsByTagName(tagName).item(0)
+        return SimpleDateFormat(DATETIME_FORMAT).parse(item.textContent)
+    }
+
+    protected fun readSOAPEnvelopeField(parentElement: Element, tagName: String, field: ByteArray?): ByteArray {
+        val item = parentElement.getElementsByTagName(tagName).item(0)
+        return java.util.Base64.getDecoder().decode(item.textContent)
+    }
+
+    protected inline fun <reified T> readSOAPEnvelopeField(parentElement: Element, tagName: String, field: Array<T>): Array<T> {
+        val items = parentElement.getElementsByTagName(tagName)
+        val list = mutableListOf<T>()
+        for (i in 0 until items.length) {
+            val item = items.item(i)
+            val value = when (val value = field.getOrNull(0)) {
+                is String? -> item.textContent
+                is Boolean? -> item.textContent.equals("true", ignoreCase = true)
+                is Int? -> item.textContent.toInt()
+                is Float? -> item.textContent.toFloat()
+                is Long? -> item.textContent.toLong()
+                is java.util.Date? -> SimpleDateFormat(DATETIME_FORMAT).parse(item.textContent)
+                is ByteArray? -> java.util.Base64.getDecoder().decode(item.textContent)
+                is XSDType? -> NotImplementedError() // TODO
+                else -> null
+            } as T
+            list.add(value)
+        }
+        return list.toTypedArray()
+    }
+
+    protected fun <T : XSDType?> readSOAPEnvelopeField(bodyElement: Element, name: String, field: T): T {
+        throw NotImplementedError() // TODO
     }
 }
 
@@ -83,6 +129,8 @@ fun Any?.xmlElements(name: String, document: Document): Array<Element> {
     val element = document.createElement(name)
     when (this) {
         is Date -> element.textContent = SimpleDateFormat(DATETIME_FORMAT).format(this)
+        is ByteArray -> java.util.Base64.getEncoder().encodeToString(this)
+        is Array<*> -> return this.map { it.xmlElements(name, document).first() }.toTypedArray()
         else -> element.textContent = this.toString() // TODO: process by Type
     }
 
