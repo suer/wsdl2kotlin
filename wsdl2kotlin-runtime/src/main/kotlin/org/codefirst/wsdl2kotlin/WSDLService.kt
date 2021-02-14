@@ -117,9 +117,9 @@ abstract class WSDLService(
         val document = builder.parse(responseBody?.byteInputStream())
         var bodyElement = document.getElementsByTagNameNS("http://schemas.xmlsoap.org/soap/envelope/", "Body").item(0) as Element
 
-        val fault = bodyElement.getElementsByTagNameNS("http://schemas.xmlsoap.org/soap/envelope/", "Fault").item(0) as Element
+        val fault = bodyElement.getElementsByTagNameNS("http://schemas.xmlsoap.org/soap/envelope/", "Fault").item(0)
         if (fault != null) {
-            val faultString = fault.getElementsByTagName("faultstring").item(0).textContent
+            val faultString = (fault as Element).getElementsByTagName("faultstring").item(0).textContent
             throw SOAPFaultException(faultString)
         }
 
