@@ -1,5 +1,6 @@
 package org.codefirst.wsdl2kotlin
 
+import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -137,27 +138,31 @@ fun Any?.xmlElements(name: String, document: Document): Array<Element> {
     return arrayOf(element)
 }
 
-abstract class WSDLService(
-    // TODO: Intercepter
-) {
+abstract class WSDLService() {
     abstract val targetNamespace: String
     abstract var endpoint: String
     abstract var path: String
 
+    protected val interceptors = mutableListOf<Interceptor>()
+
     protected inline fun <I : XSDType, reified O : XSDType> requestGeneric(i: I): O {
 
         val soapRequest = i.soapRequest(targetNamespace)
-        println(soapRequest.dump()) // TODO: remove this line
 
         val request = Request.Builder()
             .url(endpoint + "/" + path)
             .post(soapRequest.dump().toRequestBody("text/xml".toMediaTypeOrNull()))
             .build()
-        val client = OkHttpClient.Builder().build()
+        val client = OkHttpClient.Builder()
+            .also { builder ->
+                interceptors.forEach {
+                    builder.addInterceptor(it)
+                }
+            }
+            .build()
         val response = client.newCall(request).execute()
 
         val responseBody = response.body?.string()
-        println(responseBody) // TODO: remove this line
 
         val factory = DocumentBuilderFactory.newInstance()
         factory.isNamespaceAware = true
@@ -174,6 +179,10 @@ abstract class WSDLService(
         val o = O::class.java.newInstance()
         o.readSOAPEnvelope(bodyElement)
         return o
+    }
+
+    fun addInterceptor(interceptor: Interceptor) {
+        interceptors.add(interceptor)
     }
 }
 
