@@ -15,6 +15,8 @@ import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
+import kotlin.reflect.KMutableProperty
+import kotlin.reflect.full.memberProperties
 
 data class XMLParam(
     val namespace: String,
@@ -121,8 +123,27 @@ abstract class XSDType {
         return list.toTypedArray()
     }
 
-    protected fun <T : XSDType?> readSOAPEnvelopeField(bodyElement: Element, name: String, field: T): T {
-        throw NotImplementedError() // TODO
+    protected inline fun <reified T : XSDType?> readSOAPEnvelopeField(parentElement: Element, name: String, field: T): T {
+        val t = T::class.java.newInstance() as XSDType
+        val properties = t.javaClass.kotlin.memberProperties
+
+        properties.filterIsInstance<KMutableProperty<*>>().forEach { p ->
+            val param = t.xmlParams().first { p.name == it.name }
+            val v = when (val value = param.value) {
+                is String? -> readSOAPEnvelopeField(parentElement, param.name, value)
+                is Boolean? -> readSOAPEnvelopeField(parentElement, param.name, value)
+                is Int? -> readSOAPEnvelopeField(parentElement, param.name, value)
+                is Float? -> readSOAPEnvelopeField(parentElement, param.name, value)
+                is Long? -> readSOAPEnvelopeField(parentElement, param.name, value)
+                is java.util.Date? -> readSOAPEnvelopeField(parentElement, param.name, value)
+                is ByteArray? -> readSOAPEnvelopeField(parentElement, param.name, value)
+                is XSDType? -> throw NotImplementedError() // TODO recursive
+                else -> null
+            }
+            p.setter.call(t, v)
+        }
+
+        return t as T
     }
 }
 
