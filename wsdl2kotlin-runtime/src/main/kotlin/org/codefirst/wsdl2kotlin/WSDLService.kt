@@ -132,6 +132,13 @@ fun Any?.xmlElements(name: String, document: Document): Array<Element> {
         is Date -> element.textContent = SimpleDateFormat(DATETIME_FORMAT).format(this)
         is ByteArray -> java.util.Base64.getEncoder().encodeToString(this)
         is Array<*> -> return this.map { it.xmlElements(name, document).first() }.toTypedArray()
+        is XSDType -> {
+            this.xmlParams().forEach { param ->
+                param.value.xmlElements(param.name, document).forEach { childElement ->
+                    element.appendChild(childElement)
+                }
+            }
+        }
         else -> element.textContent = this.toString() // TODO: process by Type
     }
 
