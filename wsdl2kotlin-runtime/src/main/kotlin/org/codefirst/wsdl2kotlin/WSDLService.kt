@@ -24,7 +24,7 @@ data class XMLParam(
     val value: Any?
 )
 
-class SOAPFaultException(private val faultString: String) : RuntimeException(faultString)
+class SOAPFaultException(faultString: String) : RuntimeException(faultString)
 
 const val DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssX:00"
 
@@ -52,7 +52,7 @@ abstract class XSDType {
         return document
     }
 
-    fun xmlElements(name: String, document: Document): Array<Element> {
+    private fun xmlElements(name: String, document: Document): Array<Element> {
         val typeElement = document.createElement(name)
 
         xmlParams().forEach() { param ->
@@ -160,7 +160,7 @@ fun Any?.xmlElements(name: String, document: Document): Array<Element> {
                 }
             }
         }
-        else -> element.textContent = this.toString() // TODO: process by Type
+        else -> element.textContent = this.toString()
     }
 
     return arrayOf(element)
@@ -178,7 +178,7 @@ abstract class WSDLService() {
         val soapRequest = i.soapRequest(targetNamespace)
 
         val request = Request.Builder()
-            .url(endpoint + "/" + path)
+            .url("$endpoint/$path")
             .post(soapRequest.dump().toRequestBody("text/xml".toMediaTypeOrNull()))
             .build()
         val client = OkHttpClient.Builder()
@@ -196,7 +196,7 @@ abstract class WSDLService() {
         factory.isNamespaceAware = true
         val builder = factory.newDocumentBuilder()
         val document = builder.parse(responseBody?.byteInputStream())
-        var bodyElement = document.getElementsByTagNameNS("http://schemas.xmlsoap.org/soap/envelope/", "Body").item(0) as Element
+        val bodyElement = document.getElementsByTagNameNS("http://schemas.xmlsoap.org/soap/envelope/", "Body").item(0) as Element
 
         val fault = bodyElement.getElementsByTagNameNS("http://schemas.xmlsoap.org/soap/envelope/", "Fault").item(0) as? Element
         if (fault != null) {
