@@ -15,13 +15,15 @@ import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
+import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.memberProperties
 
 data class XMLParam(
     val namespace: String,
     val name: String,
-    val value: Any?
+    val value: Any?,
+    val clazz: KClass<*>
 )
 
 class SOAPFaultException(faultString: String) : RuntimeException(faultString)
