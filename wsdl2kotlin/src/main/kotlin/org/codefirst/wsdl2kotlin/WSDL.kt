@@ -101,6 +101,16 @@ class XSDElement {
         return kotlinTypeName
     }
 
+    fun kclassInKotlin(service: WSDLService): String? {
+        val kotlinTypeName = baseTypeInKotlin(service)
+
+        if (maxOccurs == "unbounded") {
+            return "Array<$kotlinTypeName>::class"
+        }
+
+        return "$kotlinTypeName::class"
+    }
+
     fun initialValue(service: WSDLService): String {
         val kotlinTypeName = baseTypeInKotlin(service)
 

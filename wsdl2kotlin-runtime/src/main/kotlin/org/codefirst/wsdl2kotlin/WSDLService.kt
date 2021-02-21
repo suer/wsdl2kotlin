@@ -7,21 +7,24 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.w3c.dom.Document
 import org.w3c.dom.Element
+import org.w3c.dom.Node
 import java.io.StringWriter
 import java.text.SimpleDateFormat
-import java.util.Date
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
+import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
+import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.memberProperties
 
 data class XMLParam(
     val namespace: String,
     val name: String,
-    val value: Any?
+    val value: Any?,
+    val clazz: KClass<*>
 )
 
 class SOAPFaultException(faultString: String) : RuntimeException(faultString)
@@ -56,7 +59,11 @@ abstract class XSDType {
         val typeElement = document.createElement(name)
 
         xmlParams().forEach() { param ->
-            val name = if (param.namespace.isBlank()) { param.name } else { "${param.namespace}:${param.name}" }
+            val name = if (param.namespace.isBlank()) {
+                param.name
+            } else {
+                "${param.namespace}:${param.name}"
+            }
             xmlElements(param.value, name, document)?.forEach {
                 typeElement.appendChild(it)
             }
@@ -68,7 +75,7 @@ abstract class XSDType {
     private fun xmlElements(value: Any?, name: String, document: Document): Array<Element> {
         val element = document.createElement(name)
         when (value) {
-            is Date -> element.textContent = SimpleDateFormat(DATETIME_FORMAT).format(value)
+            is java.util.Date -> element.textContent = SimpleDateFormat(DATETIME_FORMAT).format(value)
             is ByteArray -> element.textContent = java.util.Base64.getEncoder().encodeToString(value)
             is Array<*> -> return value.map { xmlElements(it, name, document).first() }.toTypedArray() // TODO: nested array
             is XSDType -> {
@@ -86,83 +93,58 @@ abstract class XSDType {
 
     abstract fun readSOAPEnvelope(bodyElement: Element)
 
-    protected fun readSOAPEnvelopeField(parentElement: Element, tagName: String, field: String?): String {
-        val item = parentElement.getElementsByTagName(tagName).item(0)
-        return item.textContent
-    }
+    protected fun <T : Any> readSOAPEnvelopeField(parentElement: Element, tagName: String, clazz: KClass<T>): T {
+        if (clazz.isSubclassOf(XSDType::class)) {
+            val t = clazz.java.newInstance() as XSDType
+            val properties = t.javaClass.kotlin.memberProperties
 
-    protected fun readSOAPEnvelopeField(parentElement: Element, tagName: String, field: Boolean?): Boolean {
-        val item = parentElement.getElementsByTagName(tagName).item(0)
-        return item.textContent.equals("true", ignoreCase = true)
-    }
+            properties.filterIsInstance<KMutableProperty<*>>().forEach { p ->
+                val param = t.xmlParams().first { p.name == it.name }
 
-    protected fun readSOAPEnvelopeField(parentElement: Element, tagName: String, field: Int?): Int {
-        val item = parentElement.getElementsByTagName(tagName).item(0)
-        return item.textContent.toInt()
-    }
+                val v = readSOAPEnvelopeField(parentElement, param.name, param.clazz)
 
-    protected fun readSOAPEnvelopeField(parentElement: Element, tagName: String, field: Float?): Float {
-        val item = parentElement.getElementsByTagName(tagName).item(0)
-        return item.textContent.toFloat()
-    }
-
-    protected fun readSOAPEnvelopeField(parentElement: Element, tagName: String, field: Long?): Long {
-        val item = parentElement.getElementsByTagName(tagName).item(0)
-        return item.textContent.toLong()
-    }
-
-    protected fun readSOAPEnvelopeField(parentElement: Element, tagName: String, field: java.util.Date?): java.util.Date {
-        val item = parentElement.getElementsByTagName(tagName).item(0)
-        return SimpleDateFormat(DATETIME_FORMAT).parse(item.textContent)
-    }
-
-    protected fun readSOAPEnvelopeField(parentElement: Element, tagName: String, field: ByteArray?): ByteArray {
-        val item = parentElement.getElementsByTagName(tagName).item(0)
-        return java.util.Base64.getDecoder().decode(item.textContent)
-    }
-
-    protected inline fun <reified T> readSOAPEnvelopeField(parentElement: Element, tagName: String, field: Array<T>): Array<T> {
-        val items = parentElement.getElementsByTagName(tagName)
-        val list = mutableListOf<T>()
-        for (i in 0 until items.length) {
-            val item = items.item(i)
-            val value = when (val value = field.getOrNull(0)) {
-                is String? -> item.textContent
-                is Boolean? -> item.textContent.equals("true", ignoreCase = true)
-                is Int? -> item.textContent.toInt()
-                is Float? -> item.textContent.toFloat()
-                is Long? -> item.textContent.toLong()
-                is java.util.Date? -> SimpleDateFormat(DATETIME_FORMAT).parse(item.textContent)
-                is ByteArray? -> java.util.Base64.getDecoder().decode(item.textContent)
-                is XSDType? -> NotImplementedError() // TODO
-                else -> null
-            } as T
-            list.add(value)
-        }
-        return list.toTypedArray()
-    }
-
-    protected inline fun <reified T : XSDType?> readSOAPEnvelopeField(parentElement: Element, name: String, field: T): T {
-        val t = T::class.java.newInstance() as XSDType
-        val properties = t.javaClass.kotlin.memberProperties
-
-        properties.filterIsInstance<KMutableProperty<*>>().forEach { p ->
-            val param = t.xmlParams().first { p.name == it.name }
-            val v = when (val value = param.value) {
-                is String? -> readSOAPEnvelopeField(parentElement, param.name, value)
-                is Boolean? -> readSOAPEnvelopeField(parentElement, param.name, value)
-                is Int? -> readSOAPEnvelopeField(parentElement, param.name, value)
-                is Float? -> readSOAPEnvelopeField(parentElement, param.name, value)
-                is Long? -> readSOAPEnvelopeField(parentElement, param.name, value)
-                is java.util.Date? -> readSOAPEnvelopeField(parentElement, param.name, value)
-                is ByteArray? -> readSOAPEnvelopeField(parentElement, param.name, value)
-                is XSDType? -> throw NotImplementedError() // TODO recursive
-                else -> null
+                p.setter.call(t, v)
             }
-            p.setter.call(t, v)
+
+            return t as T
         }
 
-        return t as T
+        if (clazz != ByteArray::class && clazz.java.isArray) {
+            val k = clazz.java.componentType.kotlin
+
+            val items = parentElement.getElementsByTagName(tagName)
+            val nodes = mutableListOf<Node>()
+            for (i in 0 until items.length) {
+                nodes.add(items.item(i))
+            }
+            val array = nodes.map { singleNodeToObject(it, k) }.toTypedArray() // TODO: XSDType
+            return when (k) {
+                String::class -> array.map { it as String }.toTypedArray()
+                Boolean::class -> array.map { it as Boolean }.toTypedArray()
+                Int::class -> array.map { it as Int }.toTypedArray()
+                Float::class -> array.map { it as Float }.toTypedArray()
+                Long::class -> array.map { it as Long }.toTypedArray()
+                java.util.Date::class -> array.map { it as java.util.Date }.toTypedArray()
+                ByteArray::class -> array.map { it as ByteArray }.toTypedArray()
+                else -> array
+            } as T
+        }
+
+        val item = parentElement.getElementsByTagName(tagName).item(0)
+        return singleNodeToObject(item, clazz)
+    }
+
+    private fun <T : Any> singleNodeToObject(item: Node, clazz: KClass<T>): T {
+        return when (clazz) {
+            String::class -> item.textContent
+            Boolean::class -> item.textContent.equals("true", ignoreCase = true)
+            Int::class -> item.textContent.toInt()
+            Float::class -> item.textContent.toFloat()
+            Long::class -> item.textContent.toLong()
+            java.util.Date::class -> SimpleDateFormat(DATETIME_FORMAT).parse(item.textContent)
+            ByteArray::class -> java.util.Base64.getDecoder().decode(item.textContent)
+            else -> null
+        } as T
     }
 }
 
