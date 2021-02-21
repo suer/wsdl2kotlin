@@ -57,12 +57,31 @@ abstract class XSDType {
 
         xmlParams().forEach() { param ->
             val name = if (param.namespace.isBlank()) { param.name } else { "${param.namespace}:${param.name}" }
-            param.value?.xmlElements(name, document)?.forEach {
+            xmlElements(param.value, name, document)?.forEach {
                 typeElement.appendChild(it)
             }
         }
 
         return arrayOf(typeElement)
+    }
+
+    private fun xmlElements(value: Any?, name: String, document: Document): Array<Element> {
+        val element = document.createElement(name)
+        when (value) {
+            is Date -> element.textContent = SimpleDateFormat(DATETIME_FORMAT).format(value)
+            is ByteArray -> element.textContent = java.util.Base64.getEncoder().encodeToString(value)
+            is Array<*> -> return value.map { xmlElements(it, name, document).first() }.toTypedArray() // TODO: nested array
+            is XSDType -> {
+                value.xmlParams().forEach { param ->
+                    xmlElements(param.value, param.name, document).forEach { childElement ->
+                        element.appendChild(childElement)
+                    }
+                }
+            }
+            else -> element.textContent = value.toString()
+        }
+
+        return arrayOf(element)
     }
 
     abstract fun readSOAPEnvelope(bodyElement: Element)
@@ -145,25 +164,6 @@ abstract class XSDType {
 
         return t as T
     }
-}
-
-fun Any?.xmlElements(name: String, document: Document): Array<Element> {
-    val element = document.createElement(name)
-    when (this) {
-        is Date -> element.textContent = SimpleDateFormat(DATETIME_FORMAT).format(this)
-        is ByteArray -> element.textContent = java.util.Base64.getEncoder().encodeToString(this)
-        is Array<*> -> return this.map { it.xmlElements(name, document).first() }.toTypedArray()
-        is XSDType -> {
-            this.xmlParams().forEach { param ->
-                param.value.xmlElements(param.name, document).forEach { childElement ->
-                    element.appendChild(childElement)
-                }
-            }
-        }
-        else -> element.textContent = this.toString()
-    }
-
-    return arrayOf(element)
 }
 
 abstract class WSDLService() {
