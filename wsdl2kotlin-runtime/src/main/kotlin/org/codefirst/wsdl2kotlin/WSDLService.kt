@@ -187,12 +187,10 @@ abstract class WSDLService() {
             .build()
         val response = client.newCall(request).execute()
 
-        val responseBody = response.body?.string()
-
         val factory = DocumentBuilderFactory.newInstance()
         factory.isNamespaceAware = true
         val builder = factory.newDocumentBuilder()
-        val document = builder.parse(responseBody?.byteInputStream())
+        val document = builder.parse(response.body?.byteStream())
         val bodyElement = document.getElementsByTagNameNS("http://schemas.xmlsoap.org/soap/envelope/", "Body").item(0) as Element
 
         val fault = bodyElement.getElementsByTagNameNS("http://schemas.xmlsoap.org/soap/envelope/", "Fault").item(0) as? Element
