@@ -4,11 +4,11 @@ import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.RequestBody
+import okio.BufferedSink
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
-import java.io.StringWriter
 import java.text.SimpleDateFormat
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.OutputKeys
@@ -174,9 +174,19 @@ abstract class WSDLService() {
 
         val soapRequest = i.soapRequest(targetNamespace)
 
+        val requestBody = object : RequestBody() {
+            override fun contentType() = "text/xml".toMediaTypeOrNull()
+
+            override fun writeTo(sink: BufferedSink) {
+                val transformer = TransformerFactory.newInstance().newTransformer()
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes")
+                transformer.transform(DOMSource(soapRequest), StreamResult(sink.outputStream()))
+            }
+        }
+
         val request = Request.Builder()
             .url("$endpoint/$path")
-            .post(soapRequest.dump().toRequestBody("text/xml".toMediaTypeOrNull()))
+            .post(requestBody)
             .build()
         val client = OkHttpClient.Builder()
             .also { builder ->
@@ -207,12 +217,4 @@ abstract class WSDLService() {
     fun addInterceptor(interceptor: Interceptor) {
         interceptors.add(interceptor)
     }
-}
-
-fun Document.dump(): String {
-    val writer = StringWriter()
-    val transformer = TransformerFactory.newInstance().newTransformer()
-    transformer.setOutputProperty(OutputKeys.INDENT, "yes")
-    transformer.transform(DOMSource(this), StreamResult(writer))
-    return writer.toString()
 }
