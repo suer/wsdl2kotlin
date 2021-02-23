@@ -218,10 +218,3 @@ fun Document.dump(): String {
     transformer.transform(DOMSource(this), StreamResult(writer))
     return writer.toString()
 }
-
-// fun main() {
-//    val req = TempConvert_FahrenheitToCelsius()
-//    req.Fahrenheit = "100"
-//    val res = TempConvert().also { it.endpoint = "https://www.w3schools.com/xml" }.request(req)
-//    println(res.FahrenheitToCelsiusResult)
-// }
