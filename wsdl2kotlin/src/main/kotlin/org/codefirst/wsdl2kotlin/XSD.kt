@@ -58,6 +58,18 @@ class XSDElement {
         return kotlinTypeName
     }
 
+    private fun isNullable(): Boolean {
+        return maxOccurs != "unbounded" && minOccurs == 0
+    }
+
+    fun readMethod(): String {
+        return if (isNullable()) {
+            "readSOAPEnvelopeFieldNullable"
+        } else {
+            "readSOAPEnvelopeField"
+        }
+    }
+
     fun kclassInKotlin(service: WSDLService): String? {
         val kotlinTypeName = baseTypeInKotlin(service)
 

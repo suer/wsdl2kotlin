@@ -85,6 +85,7 @@ abstract class XSDType {
                     }
                 }
             }
+            null -> return arrayOf()
             else -> element.textContent = value.toString()
         }
 
@@ -94,6 +95,10 @@ abstract class XSDType {
     abstract fun readSOAPEnvelope(bodyElement: Element)
 
     protected fun <T : Any> readSOAPEnvelopeField(parentElement: Element, tagName: String, clazz: KClass<T>): T {
+        return readSOAPEnvelopeFieldNullable(parentElement, tagName, clazz)!!
+    }
+
+    protected fun <T : Any> readSOAPEnvelopeFieldNullable(parentElement: Element, tagName: String, clazz: KClass<T>): T? {
         if (clazz.isSubclassOf(XSDType::class)) {
             val t = clazz.java.newInstance() as XSDType
             val properties = t.javaClass.kotlin.memberProperties
@@ -101,7 +106,7 @@ abstract class XSDType {
             properties.filterIsInstance<KMutableProperty<*>>().forEach { p ->
                 val param = t.xmlParams().first { p.name == it.name }
 
-                val v = readSOAPEnvelopeField(parentElement, param.name, param.clazz)
+                val v = readSOAPEnvelopeFieldNullable(parentElement, param.name, param.clazz)
 
                 p.setter.call(t, v)
             }
@@ -139,7 +144,7 @@ abstract class XSDType {
             } as T
         }
 
-        val item = parentElement.getElementsByTagName(tagName).item(0)
+        val item = parentElement.getElementsByTagName(tagName).item(0) ?: return null
         return singleNodeToObject(item, clazz)
     }
 
