@@ -158,7 +158,7 @@ abstract class XSDType {
             Long::class -> item.textContent.toLong()
             java.util.Date::class -> SimpleDateFormat(DATETIME_FORMAT).parse(item.textContent)
             ByteArray::class -> java.util.Base64.getDecoder().decode(item.textContent)
-            else -> null
+            else -> throw NotImplementedError("Unsupported type: ${clazz.simpleName}")
         } as T
     }
 }
