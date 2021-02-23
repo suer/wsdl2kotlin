@@ -61,7 +61,7 @@ class ${wsdl.service.name} : WSDLService() {
     private fun generateType(name: String, wsdl: WSDLDefinitions, complexType: XSDComplexType?, namespace: String): String {
         var kotlin = """
 class ${wsdl.service.name}_$name : XSDType() {"""
-        complexType?.sequence?.elements?.forEach {
+        complexType?.sequence?.elements?.filter { it.type != null }?.forEach {
             kotlin += """
     var ${it.safeName}: ${it.typeInKotlin(wsdl.service)} = ${it.initialValue(wsdl.service)}"""
         }
@@ -70,7 +70,7 @@ class ${wsdl.service.name}_$name : XSDType() {"""
 
     override fun xmlParams(): Array<XMLParam> {
         return arrayOf("""
-        complexType?.sequence?.elements?.forEach {
+        complexType?.sequence?.elements?.filter { it.type != null }?.forEach {
             kotlin += """
                 XMLParam("$namespace", "${it.name}", ${it.safeName}, ${it.kclassInKotlin(wsdl.service)}),"""
         }
@@ -79,7 +79,7 @@ class ${wsdl.service.name}_$name : XSDType() {"""
     }
 
     override fun readSOAPEnvelope(bodyElement: Element) {"""
-        complexType?.sequence?.elements?.forEach {
+        complexType?.sequence?.elements?.filter { it.type != null }?.forEach {
             kotlin += """
         ${it.safeName} = readSOAPEnvelopeField(bodyElement, "${it.name}", ${it.kclassInKotlin(wsdl.service)})"""
         }
