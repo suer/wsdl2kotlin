@@ -117,7 +117,16 @@ abstract class XSDType {
             for (i in 0 until items.length) {
                 nodes.add(items.item(i))
             }
-            val array = nodes.map { singleNodeToObject(it, k) }.toTypedArray() // TODO: XSDType
+
+            if (k.isSubclassOf(XSDType::class)) {
+                val arr = java.lang.reflect.Array.newInstance(k.java, nodes.size)
+                nodes.forEachIndexed { i, node ->
+                    java.lang.reflect.Array.set(arr, i, singleNodeToObject(node, k))
+                }
+                return arr as T
+            }
+
+            val array = nodes.map { singleNodeToObject(it, k) }.toTypedArray()
             return when (k) {
                 String::class -> array.map { it as String }.toTypedArray()
                 Boolean::class -> array.map { it as Boolean }.toTypedArray()
@@ -135,6 +144,12 @@ abstract class XSDType {
     }
 
     private fun <T : Any> singleNodeToObject(item: Node, clazz: KClass<T>): T {
+        if (clazz.isSubclassOf(XSDType::class)) {
+            val t = clazz.java.newInstance()
+            (t as XSDType).readSOAPEnvelope(item as Element)
+            return t
+        }
+
         return when (clazz) {
             String::class -> item.textContent
             Boolean::class -> item.textContent.equals("true", ignoreCase = true)
