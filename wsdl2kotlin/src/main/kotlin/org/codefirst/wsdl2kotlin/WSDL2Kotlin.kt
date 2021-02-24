@@ -81,7 +81,7 @@ class ${wsdl.service.name}_$name : XSDType() {"""
     override fun readSOAPEnvelope(bodyElement: Element) {"""
         complexType?.sequence?.elements?.filter { it.type != null }?.forEach {
             kotlin += """
-        ${it.safeName} = readSOAPEnvelopeField(bodyElement, "${it.name}", ${it.kclassInKotlin(wsdl.service)})"""
+        ${it.safeName} = ${it.readMethod()}(bodyElement, "${it.name}", ${it.kclassInKotlin(wsdl.service)})"""
         }
         kotlin += """
     }
