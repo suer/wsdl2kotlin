@@ -99,14 +99,21 @@ abstract class XSDType {
     }
 
     protected fun <T : Any> readSOAPEnvelopeFieldNullable(parentElement: Element, tagName: String, clazz: KClass<T>): T? {
+        val items = getChildElementsByTagName(parentElement, tagName)
+        if (items.isEmpty()) {
+            return null
+        }
+
         if (clazz.isSubclassOf(XSDType::class)) {
             val t = clazz.java.newInstance() as XSDType
             val properties = t.javaClass.kotlin.memberProperties
 
+            val item = items.first()
+
             properties.filterIsInstance<KMutableProperty<*>>().forEach { p ->
                 val param = t.xmlParams().first { p.name == it.name }
 
-                val v = readSOAPEnvelopeFieldNullable(parentElement, param.name, param.clazz)
+                val v = readSOAPEnvelopeFieldNullable(item, param.name, param.clazz)
 
                 p.setter.call(t, v)
             }
@@ -117,21 +124,15 @@ abstract class XSDType {
         if (clazz != ByteArray::class && clazz.java.isArray) {
             val k = clazz.java.componentType.kotlin
 
-            val items = parentElement.getElementsByTagName(tagName)
-            val nodes = mutableListOf<Node>()
-            for (i in 0 until items.length) {
-                nodes.add(items.item(i))
-            }
-
             if (k.isSubclassOf(XSDType::class)) {
-                val arr = java.lang.reflect.Array.newInstance(k.java, nodes.size)
-                nodes.forEachIndexed { i, node ->
-                    java.lang.reflect.Array.set(arr, i, singleNodeToObject(node, k))
+                val arr = java.lang.reflect.Array.newInstance(k.java, items.size)
+                items.forEachIndexed { i, item ->
+                    java.lang.reflect.Array.set(arr, i, singleNodeToObject(item, k))
                 }
                 return arr as T
             }
 
-            val array = nodes.map { singleNodeToObject(it, k) }.toTypedArray()
+            val array = items.map { singleNodeToObject(it, k) }.toTypedArray()
             return when (k) {
                 String::class -> array.map { it as String }.toTypedArray()
                 Boolean::class -> array.map { it as Boolean }.toTypedArray()
@@ -144,8 +145,16 @@ abstract class XSDType {
             } as T
         }
 
-        val item = parentElement.getElementsByTagName(tagName).item(0) ?: return null
-        return singleNodeToObject(item, clazz)
+        return singleNodeToObject(items.first(), clazz)
+    }
+
+    private fun getChildElementsByTagName(parentElement: Element, tagName: String): Array<Element> {
+        val items = parentElement.childNodes
+        val nodes = mutableListOf<Node>()
+        for (i in 0 until items.length) {
+            nodes.add(items.item(i))
+        }
+        return nodes.filter { it.localName == tagName }.map { it as Element }.toTypedArray()
     }
 
     private fun <T : Any> singleNodeToObject(item: Node, clazz: KClass<T>): T {
@@ -215,7 +224,7 @@ abstract class WSDLService() {
         }
 
         val o = O::class.java.newInstance()
-        o.readSOAPEnvelope(bodyElement)
+        o.readSOAPEnvelope(bodyElement.firstChild as Element)
         return o
     }
 
