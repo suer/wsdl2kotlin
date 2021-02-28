@@ -49,7 +49,7 @@ class XSDElement {
         val kotlinTypeName = baseTypeInKotlin(service)
 
         if (maxOccurs == "unbounded") {
-            return "Array<$kotlinTypeName>"
+            return "Array<$kotlinTypeName>?"
         }
         if (minOccurs == 0) {
             return "$kotlinTypeName?"
