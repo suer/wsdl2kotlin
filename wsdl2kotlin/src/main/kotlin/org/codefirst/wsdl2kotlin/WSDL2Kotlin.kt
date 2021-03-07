@@ -59,7 +59,14 @@ class ${wsdl.service.name} : WSDLService() {
     }
 
     private fun generateType(name: String, wsdl: WSDLDefinitions, complexType: XSDComplexType?, namespace: String): String {
-        var kotlin = """
+        var kotlin = ""
+
+        complexType?.sequence?.elements?.filter { it.type == null }?.forEach {
+            it.complexType?.name = "${complexType.name}_${it.name}"
+            kotlin += generateType("${name}_${it.name}", wsdl, it.complexType, namespace)
+        }
+
+        kotlin += """
 class ${wsdl.service.name}_$name : XSDType() {"""
         complexType?.sequence?.elements?.forEach {
             kotlin += """
