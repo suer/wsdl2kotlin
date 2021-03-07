@@ -45,8 +45,8 @@ class XSDElement {
             return name
         }
 
-    fun typeInKotlin(service: WSDLService): String? {
-        val kotlinTypeName = baseTypeInKotlin(service)
+    fun typeInKotlin(service: WSDLService, parentType: XSDComplexType?): String? {
+        val kotlinTypeName = baseTypeInKotlin(service, parentType)
 
         if (maxOccurs == "unbounded") {
             return "Array<$kotlinTypeName>?"
@@ -70,8 +70,8 @@ class XSDElement {
         }
     }
 
-    fun kclassInKotlin(service: WSDLService): String? {
-        val kotlinTypeName = baseTypeInKotlin(service)
+    fun kclassInKotlin(service: WSDLService, parentType: XSDComplexType?): String? {
+        val kotlinTypeName = baseTypeInKotlin(service, parentType)
 
         if (maxOccurs == "unbounded") {
             return "Array<$kotlinTypeName>::class"
@@ -80,8 +80,8 @@ class XSDElement {
         return "$kotlinTypeName::class"
     }
 
-    fun initialValue(service: WSDLService): String {
-        val kotlinTypeName = baseTypeInKotlin(service)
+    fun initialValue(service: WSDLService, parentType: XSDComplexType?): String {
+        val kotlinTypeName = baseTypeInKotlin(service, parentType)
 
         if (maxOccurs == "unbounded") {
             return "emptyArray<$kotlinTypeName>()"
@@ -104,9 +104,9 @@ class XSDElement {
         }
     }
 
-    private fun baseTypeInKotlin(service: WSDLService): String? {
+    private fun baseTypeInKotlin(service: WSDLService, parentType: XSDComplexType?): String? {
         if (type == null) {
-            return null
+            return service.name + "_" + parentType?.name + "_" + this.name
         }
 
         if (type?.startsWith("tns:") == true) {

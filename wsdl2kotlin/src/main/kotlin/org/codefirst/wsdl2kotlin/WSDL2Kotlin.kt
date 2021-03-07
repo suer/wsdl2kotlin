@@ -61,27 +61,27 @@ class ${wsdl.service.name} : WSDLService() {
     private fun generateType(name: String, wsdl: WSDLDefinitions, complexType: XSDComplexType?, namespace: String): String {
         var kotlin = """
 class ${wsdl.service.name}_$name : XSDType() {"""
-        complexType?.sequence?.elements?.filter { it.type != null }?.forEach {
+        complexType?.sequence?.elements?.forEach {
             kotlin += """
-    var ${it.safeName}: ${it.typeInKotlin(wsdl.service)} = ${it.initialValue(wsdl.service)}"""
+    var ${it.safeName}: ${it.typeInKotlin(wsdl.service, complexType)} = ${it.initialValue(wsdl.service, complexType)}"""
         }
 
         kotlin += """
 
     override fun xmlParams(): Array<XMLParam> {
         return arrayOf("""
-        complexType?.sequence?.elements?.filter { it.type != null }?.forEach {
+        complexType?.sequence?.elements?.forEach {
             kotlin += """
-                XMLParam("$namespace", "${it.name}", ${it.safeName}, ${it.kclassInKotlin(wsdl.service)}),"""
+                XMLParam("$namespace", "${it.name}", ${it.safeName}, ${it.kclassInKotlin(wsdl.service, complexType)}),"""
         }
         kotlin += """
         )
     }
 
     override fun readSOAPEnvelope(bodyElement: Element) {"""
-        complexType?.sequence?.elements?.filter { it.type != null }?.forEach {
+        complexType?.sequence?.elements?.forEach {
             kotlin += """
-        ${it.safeName} = ${it.readMethod()}(bodyElement, "${it.name}", ${it.kclassInKotlin(wsdl.service)})"""
+        ${it.safeName} = ${it.readMethod()}(bodyElement, "${it.name}", ${it.kclassInKotlin(wsdl.service, complexType)})"""
         }
         kotlin += """
     }
