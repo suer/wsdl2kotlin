@@ -110,7 +110,7 @@ class XSDElement {
         }
 
         if (type?.startsWith("tns:") == true) {
-            return service.name + "_" + type?.removePrefix("tns:") ?: ""
+            return service.name + "_" + type?.removePrefix("tns:")
         }
 
         return when (type?.substringAfterLast(":")) {
