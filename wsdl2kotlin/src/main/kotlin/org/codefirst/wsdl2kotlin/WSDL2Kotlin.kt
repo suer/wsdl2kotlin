@@ -48,7 +48,7 @@ class ${wsdl.service.name} : WSDLService() {
 }
 """
             wsdl.types.schema.complexTypes.forEach { complexType ->
-                kotlin += generateType(complexType?.name ?: "", wsdl, complexType, "")
+                kotlin += generateType(complexType.name ?: "", wsdl, complexType, "")
             }
 
             wsdl.types.schema.elements.filter { it.complexType != null }.forEach { element ->
