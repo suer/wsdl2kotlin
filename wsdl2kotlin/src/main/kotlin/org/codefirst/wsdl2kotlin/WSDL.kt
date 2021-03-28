@@ -6,6 +6,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement
 import java.io.File
+import java.net.URI
 
 class SOAPAddress {
     @JacksonXmlProperty(isAttribute = true)
@@ -104,6 +105,9 @@ class WSDLDefinitions {
 
         return "${service.name}_$elementName"
     }
+
+    val packageName: String
+        get() = URI(targetNamespace).host.split('.').reversed().joinToString(".")
 }
 
 class WSDL {

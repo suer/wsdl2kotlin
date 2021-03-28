@@ -10,4 +10,11 @@ class WSDLTest {
         val wsdl = WSDL.parse(path)
         assertEquals(wsdl.service.name, "TempConvert")
     }
+
+    @Test
+    fun testPackageName() {
+        val path = this::class.java.getResource("/tempconvert.wsdl.xml").file
+        val wsdl = WSDL.parse(path)
+        assertEquals(wsdl.packageName, "com.w3schools.www")
+    }
 }
