@@ -21,6 +21,9 @@ class WSDL2Kotlin() {
 
     private fun generateOutput(wsdl: WSDLDefinitions): Output {
         var kotlin = """
+package ${wsdl.packageName}
+"""
+        kotlin += """
 import org.codefirst.wsdl2kotlin.WSDLService
 import org.codefirst.wsdl2kotlin.XMLParam
 import org.codefirst.wsdl2kotlin.XSDType
@@ -62,7 +65,7 @@ class ${wsdl.service.name} : WSDLService() {
             kotlin += generateType(element.name, wsdl, element.complexType, "tns")
         }
 
-        return Output(wsdl.service.name, wsdl.targetNamespace, kotlin)
+        return Output(wsdl.service.name, wsdl.packageName, kotlin)
     }
 
     private fun generateType(name: String, wsdl: WSDLDefinitions, complexType: XSDComplexType?, namespace: String): String {
