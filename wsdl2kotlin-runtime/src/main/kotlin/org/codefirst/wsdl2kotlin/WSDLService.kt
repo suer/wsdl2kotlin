@@ -10,8 +10,10 @@ import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
 import java.text.SimpleDateFormat
+import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.OutputKeys
+import javax.xml.transform.Transformer
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
@@ -31,12 +33,20 @@ class SOAPFaultException(faultString: String) : RuntimeException(faultString)
 
 const val DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssX:00"
 
+object Singleton {
+    val documentBuilder: DocumentBuilder = DocumentBuilderFactory.newInstance().apply {
+        this.isNamespaceAware = true
+    }.newDocumentBuilder()
+    val transformer: Transformer = TransformerFactory.newInstance().newTransformer().apply {
+        this.setOutputProperty(OutputKeys.INDENT, "yes")
+    }
+}
+
 abstract class XSDType {
     abstract fun xmlParams(): Array<XMLParam>
 
     fun soapRequest(tns: String): Document {
-        val builder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-        val document = builder.newDocument()
+        val document = Singleton.documentBuilder.newDocument()
 
         val envelopeElement = document.createElement("S:Envelope")
         envelopeElement.setAttribute("xmlns:S", "http://schemas.xmlsoap.org/soap/envelope/")
@@ -192,9 +202,7 @@ abstract class WSDLService() {
             override fun contentType() = "text/xml".toMediaTypeOrNull()
 
             override fun writeTo(sink: BufferedSink) {
-                val transformer = TransformerFactory.newInstance().newTransformer()
-                transformer.setOutputProperty(OutputKeys.INDENT, "yes")
-                transformer.transform(DOMSource(soapRequest), StreamResult(sink.outputStream()))
+                Singleton.transformer.transform(DOMSource(soapRequest), StreamResult(sink.outputStream()))
             }
         }
 
@@ -211,10 +219,7 @@ abstract class WSDLService() {
             .build()
         val response = client.newCall(request).execute()
 
-        val factory = DocumentBuilderFactory.newInstance()
-        factory.isNamespaceAware = true
-        val builder = factory.newDocumentBuilder()
-        val document = builder.parse(response.body?.byteStream())
+        val document = Singleton.documentBuilder.parse(response.body?.byteStream())
         val bodyElement = document.getElementsByTagNameNS("http://schemas.xmlsoap.org/soap/envelope/", "Body").item(0) as Element
 
         val fault = bodyElement.getElementsByTagNameNS("http://schemas.xmlsoap.org/soap/envelope/", "Fault").item(0) as? Element
