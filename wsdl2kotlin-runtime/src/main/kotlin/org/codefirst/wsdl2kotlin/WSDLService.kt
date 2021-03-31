@@ -56,7 +56,7 @@ abstract class XSDType {
         val headerElement = document.createElement("S:Header")
         envelopeElement.appendChild(headerElement)
 
-        val bodyElement = document.createElement(("S:Body"))
+        val bodyElement = document.createElement("S:Body")
         envelopeElement.appendChild(bodyElement)
 
         xmlElements("tns:${this.javaClass.simpleName.split('_').last()}", document)
@@ -68,13 +68,13 @@ abstract class XSDType {
     private fun xmlElements(name: String, document: Document): Array<Element> {
         val typeElement = document.createElement(name)
 
-        xmlParams().forEach() { param ->
+        xmlParams().forEach { param ->
             val name = if (param.namespace.isBlank()) {
                 param.name
             } else {
                 "${param.namespace}:${param.name}"
             }
-            xmlElements(param.value, name, document)?.forEach {
+            xmlElements(param.value, name, document).forEach {
                 typeElement.appendChild(it)
             }
         }
@@ -87,7 +87,7 @@ abstract class XSDType {
         when (value) {
             is java.util.Date -> element.textContent = SimpleDateFormat(DATETIME_FORMAT).format(value)
             is ByteArray -> element.textContent = java.util.Base64.getEncoder().encodeToString(value)
-            is Array<*> -> return value.map { xmlElements(it, name, document).first() }.toTypedArray() // TODO: nested array
+            is Array<*> -> return value.map { xmlElements(it, name, document).first() }.toTypedArray()
             is XSDType -> {
                 value.xmlParams().forEach { param ->
                     xmlElements(param.value, param.name, document).forEach { childElement ->
