@@ -1,0 +1,287 @@
+<?xml version='1.0' encoding='UTF-8'?><!-- Published by JAX-WS RI (http://jax-ws.java.net). RI's version is JAX-WS RI 2.3.0 svn-revision#3528ea595bd29309f69172d231bbce272d21035c. --><xs:schema xmlns:tns="http://service.sample.codefirst.org/" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0" targetNamespace="http://service.sample.codefirst.org/">
+
+    <xs:element name="echoBASE64Binary" type="tns:echoBASE64Binary"/>
+
+    <xs:element name="echoBASE64BinaryResponse" type="tns:echoBASE64BinaryResponse"/>
+
+    <xs:element name="echoBoolean" type="tns:echoBoolean"/>
+
+    <xs:element name="echoBooleanResponse" type="tns:echoBooleanResponse"/>
+
+    <xs:element name="echoByteArray" type="tns:echoByteArray"/>
+
+    <xs:element name="echoByteArrayResponse" type="tns:echoByteArrayResponse"/>
+
+    <xs:element name="echoDate" type="tns:echoDate"/>
+
+    <xs:element name="echoDateResponse" type="tns:echoDateResponse"/>
+
+    <xs:element name="echoException" type="tns:echoException"/>
+
+    <xs:element name="echoExceptionResponse" type="tns:echoExceptionResponse"/>
+
+    <xs:element name="echoFloat" type="tns:echoFloat"/>
+
+    <xs:element name="echoFloatResponse" type="tns:echoFloatResponse"/>
+
+    <xs:element name="echoInt" type="tns:echoInt"/>
+
+    <xs:element name="echoIntResponse" type="tns:echoIntResponse"/>
+
+    <xs:element name="echoLong" type="tns:echoLong"/>
+
+    <xs:element name="echoLongResponse" type="tns:echoLongResponse"/>
+
+    <xs:element name="echoMap" type="tns:echoMap"/>
+
+    <xs:element name="echoMapResponse" type="tns:echoMapResponse"/>
+
+    <xs:element name="echoRoom" type="tns:echoRoom"/>
+
+    <xs:element name="echoRoomResponse" type="tns:echoRoomResponse"/>
+
+    <xs:element name="echoString" type="tns:echoString"/>
+
+    <xs:element name="echoStringArray" type="tns:echoStringArray"/>
+
+    <xs:element name="echoStringArrayResponse" type="tns:echoStringArrayResponse"/>
+
+    <xs:element name="echoStringResponse" type="tns:echoStringResponse"/>
+
+    <xs:element name="echoUser" type="tns:echoUser"/>
+
+    <xs:element name="echoUserArray" type="tns:echoUserArray"/>
+
+    <xs:element name="echoUserArrayResponse" type="tns:echoUserArrayResponse"/>
+
+    <xs:element name="echoUserResponse" type="tns:echoUserResponse"/>
+
+    <xs:element name="echoUserWithPermission" type="tns:echoUserWithPermission"/>
+
+    <xs:element name="echoUserWithPermissionResponse" type="tns:echoUserWithPermissionResponse"/>
+
+    <xs:complexType name="echoLong">
+        <xs:sequence>
+            <xs:element name="arg0" type="xs:long"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="echoLongResponse">
+        <xs:sequence>
+            <xs:element name="return" type="xs:long"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="echoInt">
+        <xs:sequence>
+            <xs:element name="arg0" type="xs:int"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="echoIntResponse">
+        <xs:sequence>
+            <xs:element name="return" type="xs:int"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="echoBASE64Binary">
+        <xs:sequence>
+            <xs:element name="arg0" type="xs:base64Binary" nillable="true" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="echoBASE64BinaryResponse">
+        <xs:sequence>
+            <xs:element name="return" type="xs:base64Binary" nillable="true" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="echoRoom">
+        <xs:sequence>
+            <xs:element name="arg0" type="tns:room" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="room" final="extension restriction">
+        <xs:sequence>
+            <xs:element name="member" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="name" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="echoRoomResponse">
+        <xs:sequence>
+            <xs:element name="return" type="tns:room" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="echoStringArray">
+        <xs:sequence>
+            <xs:element name="arg0" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="echoStringArrayResponse">
+        <xs:sequence>
+            <xs:element name="return" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="echoException">
+        <xs:sequence/>
+    </xs:complexType>
+
+    <xs:complexType name="echoExceptionResponse">
+        <xs:sequence/>
+    </xs:complexType>
+
+    <xs:complexType name="echoUser">
+        <xs:sequence>
+            <xs:element name="arg0" type="tns:user" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="user" final="extension restriction">
+        <xs:sequence>
+            <xs:element name="familyName" type="xs:string" minOccurs="0"/>
+            <xs:element name="firstName" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="echoUserResponse">
+        <xs:sequence>
+            <xs:element name="return" type="tns:user" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="echoString">
+        <xs:sequence>
+            <xs:element name="arg0" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="echoStringResponse">
+        <xs:sequence>
+            <xs:element name="return" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="echoByteArray">
+        <xs:sequence>
+            <xs:element name="arg0" type="xs:byte" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="echoByteArrayResponse">
+        <xs:sequence>
+            <xs:element name="return" type="xs:byte" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="echoUserWithPermission">
+        <xs:sequence>
+            <xs:element name="arg0" type="tns:userWithPermission" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="userWithPermission" final="extension restriction">
+        <xs:sequence>
+            <xs:element name="familyName" type="xs:string" minOccurs="0"/>
+            <xs:element name="firstName" type="xs:string" minOccurs="0"/>
+            <xs:element name="permission" type="tns:permission" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="permission" final="extension restriction">
+        <xs:sequence>
+            <xs:element name="admin" type="xs:boolean"/>
+            <xs:element name="canRead" type="xs:boolean"/>
+            <xs:element name="canWrite" type="xs:boolean"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="echoUserWithPermissionResponse">
+        <xs:sequence>
+            <xs:element name="return" type="tns:userWithPermission" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="echoUserArray">
+        <xs:sequence>
+            <xs:element name="arg0" type="tns:user" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="echoUserArrayResponse">
+        <xs:sequence>
+            <xs:element name="return" type="tns:user" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="echoMap">
+        <xs:sequence>
+            <xs:element name="arg0" type="tns:mapHolder" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="mapHolder" final="extension restriction">
+        <xs:sequence>
+            <xs:element name="map">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="entry" minOccurs="0" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="key" minOccurs="0" type="xs:string"/>
+                                    <xs:element name="value" minOccurs="0" type="xs:string"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="echoMapResponse">
+        <xs:sequence>
+            <xs:element name="return" type="tns:mapHolder" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="echoFloat">
+        <xs:sequence>
+            <xs:element name="arg0" type="xs:float"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="echoFloatResponse">
+        <xs:sequence>
+            <xs:element name="return" type="xs:float"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="echoBoolean">
+        <xs:sequence>
+            <xs:element name="arg0" type="xs:boolean"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="echoBooleanResponse">
+        <xs:sequence>
+            <xs:element name="return" type="xs:boolean"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="echoDate">
+        <xs:sequence>
+            <xs:element name="arg0" type="xs:dateTime" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="echoDateResponse">
+        <xs:sequence>
+            <xs:element name="return" type="xs:dateTime" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>
