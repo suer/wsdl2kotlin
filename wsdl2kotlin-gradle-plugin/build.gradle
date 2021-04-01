@@ -1,0 +1,23 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.4.32'
+    id 'java-library'
+    id 'java-gradle-plugin'
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+    implementation gradleApi()
+}
+
+gradlePlugin {
+    plugins {
+        simplePlugin {
+            id = "org.codefirst.wsdl2kotlin.wsdl2kotlin-gradle-plugin"
+            implementationClass = "org.codefirst.wsdl2kotlin.WSDL2KotlinPlugin"
+        }
+    }
+}

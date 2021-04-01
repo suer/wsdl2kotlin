@@ -37,3 +37,4 @@ jobs:
           path: |
             wsdl2kotlin/build/libs/wsdl2kotlin.jar
             wsdl2kotlin-runtime/build/libs/wsdl2kotlin-runtime.jar
+            wsdl2kotlin-gradle-plugin/build/libs/wsdl2kotlin-gradle-plugin.jar
