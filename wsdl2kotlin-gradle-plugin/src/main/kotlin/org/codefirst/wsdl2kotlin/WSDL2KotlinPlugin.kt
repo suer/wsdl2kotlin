@@ -5,9 +5,14 @@ import org.gradle.api.Project
 
 class WSDL2KotlinPlugin : Plugin<Project> {
     override fun apply(project: Project) {
+        val extension = project.extensions.create("wsdl2kotlin", WSDL2KotlinPluginConfiguration::class.java)
+
         project.task("wsdl2kotlin") {
-            Main()
-            println("Hello My Gradle Plugin!!")
+            val paths = extension.paths
+            val outputs = WSDL2Kotlin().run(*paths.toTypedArray())
+            outputs.forEach {
+                it.save(extension.outputDirectory ?: ".")
+            }
         }
     }
 }
