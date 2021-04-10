@@ -11,6 +11,7 @@ repositories {
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
     implementation gradleApi()
+    implementation project(':wsdl2kotlin')
 }
 
 gradlePlugin {

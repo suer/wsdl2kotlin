@@ -6,6 +6,7 @@ import org.gradle.api.Project
 class WSDL2KotlinPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.task("wsdl2kotlin") {
+            Main()
             println("Hello My Gradle Plugin!!")
         }
     }
