@@ -5,13 +5,14 @@ plugins {
 }
 
 repositories {
+    mavenLocal()
     jcenter()
 }
 
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
     implementation gradleApi()
-    implementation project(':wsdl2kotlin')
+    implementation 'org.codefirst.wsdl2kotlin:wsdl2kotlin:0.1.0-SNAPSHOT'
 }
 
 gradlePlugin {
