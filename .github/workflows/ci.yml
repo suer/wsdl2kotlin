@@ -27,10 +27,18 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Run ktlint
         run: ./gradlew ktlint
-      - name: Run Unit Test
-        run: ./gradlew test
-      - name: Build with Gradle
-        run: ./gradlew build
+      - name: Build wsdl2kotlin
+        run: |
+          cd wsdl2kotlin
+          ../gradlew test build
+      - name: Build wsdl2kotlin-runtime
+        run: |
+          cd wsdl2kotlin-runtime
+          ../gradlew test build
+      - name: Build wsdl2kotlin-gradle-plugin
+        run: |
+          cd wsdl2kotlin-gradle-plugin
+          ../gradlew test build
       - name: Upload jar files
         uses: actions/upload-artifact@v2
         with:
