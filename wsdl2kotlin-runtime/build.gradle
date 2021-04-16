@@ -12,6 +12,8 @@ plugins {
 
     // Apply the java-library plugin for API and implementation separation.
     id 'java-library'
+
+    id 'maven-publish'
 }
 
 repositories {
@@ -47,6 +49,27 @@ dependencies {
     api 'org.apache.commons:commons-math3:3.6.1'
 
     ktlint "com.pinterest:ktlint:0.41.0"
+}
+
+group 'org.codefirst.wsdl2kotlin'
+version = '0.1.0-SNAPSHOT'
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/suer/wsdl2kotlin")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+            }
+        }
+    }
+    publications {
+        gpr(MavenPublication) {
+            from(components.java)
+        }
+    }
 }
 
 task ktlint(type: JavaExec, group: "verification") {

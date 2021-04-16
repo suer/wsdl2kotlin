@@ -1,0 +1,43 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    env:
+      USERNAME: suer
+      TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: '8'
+      - uses: actions/cache@v2.1.4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Run ktlint
+        run: ./gradlew ktlint
+      - name: Build wsdl2kotlin
+        run: |
+          cd wsdl2kotlin
+          ../gradlew test build install publish
+      - name: Build wsdl2kotlin-runtime
+        run: |
+          cd wsdl2kotlin-runtime
+          ../gradlew test build publish
+      - name: Build wsdl2kotlin-gradle-plugin
+        run: |
+          cd wsdl2kotlin-gradle-plugin
+          ../gradlew test build publish
