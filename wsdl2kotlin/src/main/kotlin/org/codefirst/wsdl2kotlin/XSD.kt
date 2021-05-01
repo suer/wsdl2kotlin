@@ -104,25 +104,33 @@ class XSDElement {
         }
     }
 
-    private fun baseTypeInKotlin(service: WSDLService, parentType: XSDComplexType?): String? {
-        if (type == null) {
-            return service.name + "_" + parentType?.name + "_" + this.name
-        }
+    private fun baseTypeInKotlin(service: WSDLService, parentType: XSDComplexType?): String {
+        return TypeResolver.baseTypeInKotlin(this.name, this.type, service, parentType)
+    }
+}
 
-        if (type?.startsWith("tns:") == true) {
-            return service.name + "_" + type?.removePrefix("tns:")
-        }
+private class TypeResolver {
+    companion object {
+        fun baseTypeInKotlin(name: String, type: String?, service: WSDLService, parentType: XSDComplexType?): String {
+            if (type == null) {
+                return service.name + "_" + parentType?.name + "_" + name
+            }
 
-        return when (type?.substringAfterLast(":")) {
-            "string" -> "String"
-            "boolean" -> "Boolean"
-            "byte" -> "Byte"
-            "int" -> "Int"
-            "float" -> "Float"
-            "long" -> "Long"
-            "dateTime" -> "java.util.Date"
-            "base64Binary" -> "ByteArray"
-            else -> ""
+            if (type.startsWith("tns:")) {
+                return service.name + "_" + type.removePrefix("tns:")
+            }
+
+            return when (type.substringAfterLast(":")) {
+                "string" -> "String"
+                "boolean" -> "Boolean"
+                "byte" -> "Byte"
+                "int" -> "Int"
+                "float" -> "Float"
+                "long" -> "Long"
+                "dateTime" -> "java.util.Date"
+                "base64Binary" -> "ByteArray"
+                else -> ""
+            }
         }
     }
 }
