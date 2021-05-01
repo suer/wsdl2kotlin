@@ -56,6 +56,10 @@
 
     <xs:element name="echoUserResponse" type="tns:echoUserResponse"/>
 
+    <xs:element name="echoUserWithAge" type="tns:echoUserWithAge"/>
+
+    <xs:element name="echoUserWithAgeResponse" type="tns:echoUserWithAgeResponse"/>
+
     <xs:element name="echoUserWithPermission" type="tns:echoUserWithPermission"/>
 
     <xs:element name="echoUserWithPermissionResponse" type="tns:echoUserWithPermissionResponse"/>
@@ -141,7 +145,7 @@
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="user" final="extension restriction">
+    <xs:complexType name="user">
         <xs:sequence>
             <xs:element name="familyName" type="xs:string" minOccurs="0"/>
             <xs:element name="firstName" type="xs:string" minOccurs="0"/>
@@ -175,6 +179,28 @@
     <xs:complexType name="echoByteArrayResponse">
         <xs:sequence>
             <xs:element name="return" type="xs:byte" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="echoUserWithAge">
+        <xs:sequence>
+            <xs:element name="arg0" minOccurs="0" type="tns:userWithAge"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="userWithAge" final="extension restriction">
+        <xs:complexContent>
+            <xs:extension base="tns:user">
+                <xs:sequence>
+                    <xs:element name="age" type="xs:int"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="echoUserWithAgeResponse">
+        <xs:sequence>
+            <xs:element name="return" minOccurs="0" type="tns:userWithAge"/>
         </xs:sequence>
     </xs:complexType>
 

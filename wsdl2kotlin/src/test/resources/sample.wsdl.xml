@@ -94,6 +94,12 @@
     <message name="echoRoomResponse">
         <part name="parameters" element="tns:echoRoomResponse"/>
     </message>
+    <message name="echoUserWithAge">
+        <part name="parameters" element="tns:echoUserWithAge"/>
+    </message>
+    <message name="echoUserWithAgeResponse">
+        <part name="parameters" element="tns:echoUserWithAgeResponse"/>
+    </message>
     <portType name="Sample">
         <operation name="echoString">
             <input wsam:Action="http://service.sample.codefirst.org/Sample/echoStringRequest" message="tns:echoString"/>
@@ -154,6 +160,10 @@
         <operation name="echoRoom">
             <input wsam:Action="http://service.sample.codefirst.org/Sample/echoRoomRequest" message="tns:echoRoom"/>
             <output wsam:Action="http://service.sample.codefirst.org/Sample/echoRoomResponse" message="tns:echoRoomResponse"/>
+        </operation>
+        <operation name="echoUserWithAge">
+            <input wsam:Action="http://service.sample.codefirst.org/Sample/echoUserWithAgeRequest" message="tns:echoUserWithAge"/>
+            <output wsam:Action="http://service.sample.codefirst.org/Sample/echoUserWithAgeResponse" message="tns:echoUserWithAgeResponse"/>
         </operation>
     </portType>
     <binding name="SamplePortBinding" type="tns:Sample">
@@ -285,6 +295,15 @@
             </output>
         </operation>
         <operation name="echoRoom">
+            <soap:operation soapAction=""/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="echoUserWithAge">
             <soap:operation soapAction=""/>
             <input>
                 <soap:body use="literal"/>
