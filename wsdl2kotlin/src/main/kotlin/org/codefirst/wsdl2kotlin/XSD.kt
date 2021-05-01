@@ -13,11 +13,40 @@ class XSDSequence {
     var elements: MutableList<XSDElement> = mutableListOf()
 }
 
+class XSDExtension {
+    @JacksonXmlProperty(isAttribute = true)
+    var base: String = ""
+
+    var sequence: XSDSequence? = null
+}
+
+class XSDComplexContent {
+    var extension: XSDExtension? = null
+}
+
 class XSDComplexType {
     @JacksonXmlProperty(isAttribute = true)
     var name: String? = null
 
     var sequence: XSDSequence? = null
+
+    var complexContent: XSDComplexContent? = null
+
+    @JacksonXmlProperty(isAttribute = true)
+    var final: String? = null
+
+    val isFinal: Boolean
+        get() = !final.isNullOrEmpty()
+
+    val isExtended: Boolean
+        get() = this.complexContent?.extension?.base != null
+
+    fun baseTypeInKotlin(service: WSDLService): String? {
+        if (!isExtended) {
+            return null
+        }
+        return TypeResolver.baseTypeInKotlin("", this.complexContent?.extension?.base, service, this)
+    }
 }
 
 class XSDElement {

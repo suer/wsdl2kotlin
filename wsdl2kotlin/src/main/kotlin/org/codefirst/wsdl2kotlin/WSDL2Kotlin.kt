@@ -71,13 +71,18 @@ class ${wsdl.service.name} : WSDLService() {
     private fun generateType(name: String, wsdl: WSDLDefinitions, complexType: XSDComplexType?, namespace: String): String {
         var kotlin = ""
 
+        val subClassSequence = complexType?.complexContent?.extension?.sequence
+        if (subClassSequence != null) {
+            complexType.sequence = subClassSequence
+        }
+
         complexType?.sequence?.elements?.filter { it.type == null }?.forEach {
             it.complexType?.name = "${complexType.name}_${it.name}"
             kotlin += generateType("${name}_${it.name}", wsdl, it.complexType, namespace)
         }
 
         kotlin += """
-class ${wsdl.service.name}_$name : XSDType() {"""
+${if (complexType?.isFinal == true) { "" } else { "open "}}class ${wsdl.service.name}_$name : ${complexType?.baseTypeInKotlin(wsdl.service) ?: "XSDType"}() {"""
         complexType?.sequence?.elements?.forEach {
             kotlin += """
     var ${it.safeName}: ${it.typeInKotlin(wsdl.service, complexType)} = ${it.initialValue(wsdl.service, complexType)}"""
@@ -86,7 +91,7 @@ class ${wsdl.service.name}_$name : XSDType() {"""
         kotlin += """
 
     override fun xmlParams(): Array<XMLParam> {
-        return arrayOf("""
+        return ${if (complexType?.isExtended == true) { "super.xmlParams() + " } else { "" }}arrayOf("""
         complexType?.sequence?.elements?.forEach {
             kotlin += """
                 XMLParam("$namespace", "${it.name}", ${it.safeName}, ${it.kclassInKotlin(wsdl.service, complexType)}),"""
@@ -96,6 +101,10 @@ class ${wsdl.service.name}_$name : XSDType() {"""
     }
 
     override fun readSOAPEnvelope(bodyElement: Element) {"""
+        if (complexType?.isExtended == true) {
+            kotlin += """
+        super.readSOAPEnvelope(bodyElement)"""
+        }
         complexType?.sequence?.elements?.forEach {
             kotlin += """
         ${it.safeName} = ${it.readMethod()}(bodyElement, "${it.name}", ${it.kclassInKotlin(wsdl.service, complexType)})"""

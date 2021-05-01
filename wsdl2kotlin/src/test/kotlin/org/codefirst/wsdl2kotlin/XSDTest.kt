@@ -8,7 +8,7 @@ class XSDTest {
     fun testParse() {
         val path = this::class.java.getResource("/sample.xsd.xml").file
         val xsd = XSD.parse(path)
-        assertEquals(30, xsd.elements.size)
+        assertEquals(32, xsd.elements.size)
     }
 
     @Test
