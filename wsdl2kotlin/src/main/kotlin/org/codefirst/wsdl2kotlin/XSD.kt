@@ -88,7 +88,7 @@ class XSDElement {
     }
 
     private fun isNullable(): Boolean {
-        return maxOccurs != "unbounded" && minOccurs == 0
+        return maxOccurs == "unbounded" || minOccurs == 0
     }
 
     fun readMethod(): String {
