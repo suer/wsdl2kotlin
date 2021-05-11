@@ -66,6 +66,14 @@ publishing {
     publications {
         gpr(MavenPublication) {
             from(components.java)
+            pom {
+                licenses {
+                    license {
+                        name = "MIT License"
+                        url = "https://www.opensource.org/licenses/mit-license.php"
+                    }
+                }
+            }
         }
     }
 }
