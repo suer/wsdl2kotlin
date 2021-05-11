@@ -53,6 +53,11 @@ dependencies {
     ktlint "com.pinterest:ktlint:0.41.0"
 }
 
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
 group 'org.codefirst.wsdl2kotlin'
 version = '0.1.0-SNAPSHOT'
 
