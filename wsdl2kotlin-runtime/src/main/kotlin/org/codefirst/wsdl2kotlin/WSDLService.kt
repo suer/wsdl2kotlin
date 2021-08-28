@@ -209,7 +209,10 @@ abstract class WSDLService() {
             override fun contentType() = "text/xml".toMediaTypeOrNull()
 
             override fun writeTo(sink: BufferedSink) {
-                DocumentHelper.newTransformer().transform(DOMSource(soapRequest), StreamResult(sink.outputStream()))
+                DocumentHelper.newTransformer().transform(
+                    DOMSource(soapRequest),
+                    StreamResult(FixSurrogatePairOutputStream(sink.outputStream()))
+                )
             }
         }
 
