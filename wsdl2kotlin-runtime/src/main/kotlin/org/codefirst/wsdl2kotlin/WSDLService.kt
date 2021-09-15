@@ -115,10 +115,21 @@ abstract class XSDType {
         return readSOAPEnvelopeFieldNullable(parentElement, tagName, clazz)!!
     }
 
+    private fun <T : Any> isSingleType(clazz: KClass<T>): Boolean {
+        return when (clazz) {
+            String::class, Boolean::class, Int::class, Float::class, Long::class, java.util.Date::class, ByteArray::class -> true
+            else -> false
+        }
+    }
+
     protected fun <T : Any> readSOAPEnvelopeFieldNullable(parentElement: Element, tagName: String, clazz: KClass<T>): T? {
         val items = getChildElementsByTagName(parentElement, tagName)
         if (items.isEmpty()) {
             return null
+        }
+
+        if (isSingleType(clazz)) {
+            return singleNodeToObject(items.first(), clazz)
         }
 
         if (clazz.isSubclassOf(XSDType::class)) {
@@ -162,7 +173,7 @@ abstract class XSDType {
             } as T
         }
 
-        return singleNodeToObject(items.first(), clazz)
+        throw NotImplementedError("Unsupported type: ${clazz.simpleName}")
     }
 
     private fun getChildElementsByTagName(parentElement: Element, tagName: String): Array<Element> {
