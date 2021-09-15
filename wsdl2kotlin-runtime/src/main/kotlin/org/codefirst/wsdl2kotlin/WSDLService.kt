@@ -115,10 +115,21 @@ abstract class XSDType {
         return readSOAPEnvelopeFieldNullable(parentElement, tagName, clazz)!!
     }
 
+    private fun <T : Any> isSingleType(clazz: KClass<T>): Boolean {
+        return when (clazz) {
+            String::class, Boolean::class, Int::class, Float::class, Long::class, java.util.Date::class, ByteArray::class -> true
+            else -> false
+        }
+    }
+
     protected fun <T : Any> readSOAPEnvelopeFieldNullable(parentElement: Element, tagName: String, clazz: KClass<T>): T? {
         val items = getChildElementsByTagName(parentElement, tagName)
         if (items.isEmpty()) {
             return null
+        }
+
+        if (isSingleType(clazz)) {
+            return singleNodeToObject(items.first(), clazz)
         }
 
         if (clazz.isSubclassOf(XSDType::class)) {
@@ -162,7 +173,7 @@ abstract class XSDType {
             } as T
         }
 
-        return singleNodeToObject(items.first(), clazz)
+        throw NotImplementedError("Unsupported type: ${clazz.simpleName}")
     }
 
     private fun getChildElementsByTagName(parentElement: Element, tagName: String): Array<Element> {
@@ -175,12 +186,6 @@ abstract class XSDType {
     }
 
     private fun <T : Any> singleNodeToObject(item: Node, clazz: KClass<T>): T {
-        if (clazz.isSubclassOf(XSDType::class)) {
-            val t = clazz.java.newInstance()
-            (t as XSDType).readSOAPEnvelope(item as Element)
-            return t
-        }
-
         return when (clazz) {
             String::class -> item.textContent
             Boolean::class -> item.textContent.equals("true", ignoreCase = true)
@@ -189,7 +194,14 @@ abstract class XSDType {
             Long::class -> item.textContent.toLong()
             java.util.Date::class -> SimpleDateFormat(DATETIME_FORMAT).parse(item.textContent)
             ByteArray::class -> java.util.Base64.getDecoder().decode(item.textContent)
-            else -> throw NotImplementedError("Unsupported type: ${clazz.simpleName}")
+            else -> {
+                if (clazz.isSubclassOf(XSDType::class)) {
+                    val t = clazz.java.newInstance()
+                    (t as XSDType).readSOAPEnvelope(item as Element)
+                    return t
+                }
+                throw NotImplementedError("Unsupported type: ${clazz.simpleName}")
+            }
         } as T
     }
 }
