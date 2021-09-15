@@ -186,12 +186,6 @@ abstract class XSDType {
     }
 
     private fun <T : Any> singleNodeToObject(item: Node, clazz: KClass<T>): T {
-        if (clazz.isSubclassOf(XSDType::class)) {
-            val t = clazz.java.newInstance()
-            (t as XSDType).readSOAPEnvelope(item as Element)
-            return t
-        }
-
         return when (clazz) {
             String::class -> item.textContent
             Boolean::class -> item.textContent.equals("true", ignoreCase = true)
@@ -200,7 +194,14 @@ abstract class XSDType {
             Long::class -> item.textContent.toLong()
             java.util.Date::class -> SimpleDateFormat(DATETIME_FORMAT).parse(item.textContent)
             ByteArray::class -> java.util.Base64.getDecoder().decode(item.textContent)
-            else -> throw NotImplementedError("Unsupported type: ${clazz.simpleName}")
+            else -> {
+                if (clazz.isSubclassOf(XSDType::class)) {
+                    val t = clazz.java.newInstance()
+                    (t as XSDType).readSOAPEnvelope(item as Element)
+                    return t
+                }
+                throw NotImplementedError("Unsupported type: ${clazz.simpleName}")
+            }
         } as T
     }
 }
