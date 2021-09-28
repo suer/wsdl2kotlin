@@ -195,12 +195,10 @@ abstract class XSDType {
             java.util.Date::class -> SimpleDateFormat(DATETIME_FORMAT).parse(item.textContent)
             ByteArray::class -> java.util.Base64.getDecoder().decode(item.textContent)
             else -> {
-                if (clazz.isSubclassOf(XSDType::class)) {
-                    val t = clazz.java.newInstance()
-                    (t as XSDType).readSOAPEnvelope(item as Element)
-                    return t
-                }
-                throw NotImplementedError("Unsupported type: ${clazz.simpleName}")
+                val t = clazz.java.newInstance() as? XSDType
+                    ?: throw NotImplementedError("Unsupported type: ${clazz.simpleName}")
+                t.readSOAPEnvelope(item as Element)
+                return t as T
             }
         } as T
     }
