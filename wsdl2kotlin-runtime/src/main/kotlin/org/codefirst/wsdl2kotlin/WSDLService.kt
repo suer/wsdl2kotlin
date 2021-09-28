@@ -132,23 +132,6 @@ abstract class XSDType {
             return singleNodeToObject(items.first(), clazz)
         }
 
-        if (clazz.isSubclassOf(XSDType::class)) {
-            val t = clazz.java.newInstance() as XSDType
-            val properties = t.javaClass.kotlin.memberProperties
-
-            val item = items.first()
-
-            properties.filterIsInstance<KMutableProperty<*>>().forEach { p ->
-                val param = t.xmlParams().first { p.name == it.name }
-
-                val v = readSOAPEnvelopeFieldNullable(item, param.name, param.clazz)
-
-                p.setter.call(t, v)
-            }
-
-            return t as T
-        }
-
         if (clazz != ByteArray::class && clazz.java.isArray) {
             val k = clazz.java.componentType.kotlin
 
@@ -173,7 +156,21 @@ abstract class XSDType {
             } as T
         }
 
-        throw NotImplementedError("Unsupported type: ${clazz.simpleName}")
+        val t = clazz.java.newInstance() as? XSDType
+            ?: throw NotImplementedError("Unsupported type: ${clazz.simpleName}")
+        val properties = t.javaClass.kotlin.memberProperties
+
+        val item = items.first()
+
+        properties.filterIsInstance<KMutableProperty<*>>().forEach { p ->
+            val param = t.xmlParams().first { p.name == it.name }
+
+            val v = readSOAPEnvelopeFieldNullable(item, param.name, param.clazz)
+
+            p.setter.call(t, v)
+        }
+
+        return t as T
     }
 
     private fun getChildElementsByTagName(parentElement: Element, tagName: String): List<Element> {
