@@ -176,13 +176,16 @@ abstract class XSDType {
         throw NotImplementedError("Unsupported type: ${clazz.simpleName}")
     }
 
-    private fun getChildElementsByTagName(parentElement: Element, tagName: String): Array<Element> {
+    private fun getChildElementsByTagName(parentElement: Element, tagName: String): List<Element> {
         val items = parentElement.childNodes
-        val nodes = mutableListOf<Node>()
+        val nodes = mutableListOf<Element>()
         for (i in 0 until items.length) {
-            nodes.add(items.item(i))
+            val item = items.item(i)
+            if (item.localName == tagName) {
+                nodes.add(item as Element)
+            }
         }
-        return nodes.filter { it.localName == tagName }.map { it as Element }.toTypedArray()
+        return nodes
     }
 
     private fun <T : Any> singleNodeToObject(item: Node, clazz: KClass<T>): T {
