@@ -46,6 +46,18 @@ class DocumentHelper {
                 this.setOutputProperty(OutputKeys.INDENT, "yes")
             }
         }
+
+        fun getChildElementsByTagName(parentElement: Element, tagName: String): List<Element> {
+            val items = parentElement.childNodes
+            val nodes = mutableListOf<Element>()
+            for (i in 0 until items.length) {
+                val item = items.item(i)
+                if (item.localName == tagName) {
+                    nodes.add(item as Element)
+                }
+            }
+            return nodes
+        }
     }
 }
 
@@ -123,7 +135,7 @@ abstract class XSDType {
     }
 
     protected fun <T : Any> readSOAPEnvelopeFieldNullable(parentElement: Element, tagName: String, clazz: KClass<T>): T? {
-        val items = getChildElementsByTagName(parentElement, tagName)
+        val items = DocumentHelper.getChildElementsByTagName(parentElement, tagName)
         if (items.isEmpty()) {
             return null
         }
@@ -174,18 +186,6 @@ abstract class XSDType {
         }
 
         throw NotImplementedError("Unsupported type: ${clazz.simpleName}")
-    }
-
-    private fun getChildElementsByTagName(parentElement: Element, tagName: String): List<Element> {
-        val items = parentElement.childNodes
-        val nodes = mutableListOf<Element>()
-        for (i in 0 until items.length) {
-            val item = items.item(i)
-            if (item.localName == tagName) {
-                nodes.add(item as Element)
-            }
-        }
-        return nodes
     }
 
     private fun <T : Any> singleNodeToObject(item: Node, clazz: KClass<T>): T {
@@ -243,9 +243,9 @@ abstract class WSDLService() {
         val response = client.newCall(request).execute()
 
         val document = DocumentHelper.newDocumentBuilder().parse(response.body?.byteStream())
-        val bodyElement = document.getElementsByTagNameNS("http://schemas.xmlsoap.org/soap/envelope/", "Body").item(0) as Element
+        val bodyElement = DocumentHelper.getChildElementsByTagName(document.documentElement, "Body").first()
 
-        val fault = bodyElement.getElementsByTagNameNS("http://schemas.xmlsoap.org/soap/envelope/", "Fault").item(0) as? Element
+        val fault = DocumentHelper.getChildElementsByTagName(bodyElement, "Fault").firstOrNull()
         if (fault != null) {
             val faultString = fault.getElementsByTagName("faultstring").item(0).textContent
             throw SOAPFaultException(faultString)
