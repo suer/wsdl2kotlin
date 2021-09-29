@@ -19,7 +19,6 @@ import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
-import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.memberProperties
 
 data class XMLParam(
@@ -147,25 +146,25 @@ abstract class XSDType {
         if (clazz != ByteArray::class && clazz.java.isArray) {
             val k = clazz.java.componentType.kotlin
 
-            if (k.isSubclassOf(XSDType::class)) {
-                val arr = java.lang.reflect.Array.newInstance(k.java, items.size)
-                items.forEachIndexed { i, item ->
-                    java.lang.reflect.Array.set(arr, i, singleNodeToObject(item, k))
-                }
-                return arr as T
+            if (isSingleType(k)) {
+                val array = items.map { singleNodeToObject(it, k) }.toTypedArray()
+                return when (k) {
+                    String::class -> array.map { it as String }.toTypedArray()
+                    Boolean::class -> array.map { it as Boolean }.toTypedArray()
+                    Int::class -> array.map { it as Int }.toTypedArray()
+                    Float::class -> array.map { it as Float }.toTypedArray()
+                    Long::class -> array.map { it as Long }.toTypedArray()
+                    java.util.Date::class -> array.map { it as java.util.Date }.toTypedArray()
+                    ByteArray::class -> array.map { it as ByteArray }.toTypedArray()
+                    else -> array
+                } as T
             }
 
-            val array = items.map { singleNodeToObject(it, k) }.toTypedArray()
-            return when (k) {
-                String::class -> array.map { it as String }.toTypedArray()
-                Boolean::class -> array.map { it as Boolean }.toTypedArray()
-                Int::class -> array.map { it as Int }.toTypedArray()
-                Float::class -> array.map { it as Float }.toTypedArray()
-                Long::class -> array.map { it as Long }.toTypedArray()
-                java.util.Date::class -> array.map { it as java.util.Date }.toTypedArray()
-                ByteArray::class -> array.map { it as ByteArray }.toTypedArray()
-                else -> array
-            } as T
+            val arr = java.lang.reflect.Array.newInstance(k.java, items.size)
+            items.forEachIndexed { i, item ->
+                java.lang.reflect.Array.set(arr, i, singleNodeToObject(item, k))
+            }
+            return arr as T
         }
 
         val t = clazz.java.newInstance() as? XSDType
