@@ -44,7 +44,7 @@ dependencies {
 
     testImplementation 'com.github.tomakehurst:wiremock-standalone:2.27.2'
 
-    implementation 'com.squareup.okhttp3:okhttp:4.9.1'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.2'
 
     ktlint "com.pinterest:ktlint:0.42.1"
 }
