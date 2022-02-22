@@ -61,7 +61,8 @@ class WSDLServiceStringTest {
             |<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
             |<S:Body><ns2:echoStringResponse xmlns:ns2="http://service.sample.codefirst.org/">
             |<return>test</return></ns2:echoStringResponse></S:Body>
-            |</S:Envelope>""".trimMargin()
+            |</S:Envelope>
+        """.trimMargin()
 
         stubFor(
             post(urlEqualTo("/service"))
