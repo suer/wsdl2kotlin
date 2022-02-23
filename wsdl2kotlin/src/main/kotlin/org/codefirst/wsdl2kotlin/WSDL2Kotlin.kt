@@ -22,13 +22,14 @@ class WSDL2Kotlin() {
     private fun generateOutput(wsdl: WSDLDefinitions): Output {
         var kotlin = """
 package ${wsdl.packageName}
-"""
+        """.trimEnd(' ')
+
         kotlin += """
 import org.codefirst.wsdl2kotlin.WSDLService
 import org.codefirst.wsdl2kotlin.XMLParam
 import org.codefirst.wsdl2kotlin.XSDType
 import org.w3c.dom.Element
-"""
+        """.trimEnd(' ')
 
         val location = wsdl.service.ports.first { it.address != null }.address?.location
         val endpoint = location?.substringBeforeLast("/")
@@ -39,7 +40,7 @@ class ${wsdl.service.name} : WSDLService() {
     override val targetNamespace = "${wsdl.targetNamespace}"
     override var endpoint = "$endpoint"
     override var path = "$path"
-"""
+        """.trimEnd(' ')
         wsdl.portTypes.forEach { portType ->
             portType.operations.forEach { operation ->
                 val inputType = wsdl.findType(operation.input.message)
@@ -49,14 +50,14 @@ class ${wsdl.service.name} : WSDLService() {
     fun request(parameters: $inputType): $outputType {
         return requestGeneric<$inputType, $outputType>(parameters)
     }
-"""
+                    """.trimEnd(' ')
                 }
             }
         }
 
         kotlin += """
 }
-"""
+        """.trimEnd(' ')
         wsdl.types.schema.complexTypes.forEach { complexType ->
             kotlin += generateType(complexType.name ?: "", wsdl, complexType, "")
         }
@@ -82,37 +83,44 @@ class ${wsdl.service.name} : WSDLService() {
         }
 
         kotlin += """
-${if (complexType?.isFinal == true) { "" } else { "open "}}class ${wsdl.service.name}_$name : ${complexType?.baseTypeInKotlin(wsdl.service) ?: "XSDType"}() {"""
+${if (complexType?.isFinal == true) { "" } else { "open "}}class ${wsdl.service.name}_$name : ${complexType?.baseTypeInKotlin(wsdl.service) ?: "XSDType"}() {
+        """.trimEnd()
         complexType?.sequence?.elements?.forEach {
             kotlin += """
-    var ${it.safeName}: ${it.typeInKotlin(wsdl.service, complexType)} = ${it.initialValue(wsdl.service, complexType)}"""
+    var ${it.safeName}: ${it.typeInKotlin(wsdl.service, complexType)} = ${it.initialValue(wsdl.service, complexType)}
+            """.trimEnd()
         }
 
         kotlin += """
 
     override fun xmlParams(): Array<XMLParam> {
-        return ${if (complexType?.isExtended == true) { "super.xmlParams() + " } else { "" }}arrayOf("""
+        return ${if (complexType?.isExtended == true) { "super.xmlParams() + " } else { "" }}arrayOf(
+        """.trimEnd()
         complexType?.sequence?.elements?.forEach {
             kotlin += """
-                XMLParam("$namespace", "${it.name}", ${it.safeName}, ${it.kclassInKotlin(wsdl.service, complexType)}),"""
+                XMLParam("$namespace", "${it.name}", ${it.safeName}, ${it.kclassInKotlin(wsdl.service, complexType)}),
+            """.trimEnd()
         }
         kotlin += """
         )
     }
 
-    override fun readSOAPEnvelope(bodyElement: Element) {"""
+    override fun readSOAPEnvelope(bodyElement: Element) {
+        """.trimEnd()
         if (complexType?.isExtended == true) {
             kotlin += """
-        super.readSOAPEnvelope(bodyElement)"""
+        super.readSOAPEnvelope(bodyElement)
+            """.trimEnd()
         }
         complexType?.sequence?.elements?.forEach {
             kotlin += """
-        ${it.safeName} = ${it.readMethod()}(bodyElement, "${it.name}", ${it.kclassInKotlin(wsdl.service, complexType)})"""
+        ${it.safeName} = ${it.readMethod()}(bodyElement, "${it.name}", ${it.kclassInKotlin(wsdl.service, complexType)})
+            """.trimEnd()
         }
         kotlin += """
     }
 }
-"""
+        """.trimEnd(' ')
         return kotlin
     }
 }
