@@ -20,8 +20,7 @@ class WSDL2Kotlin() {
     }
 
     private fun generateOutput(wsdl: WSDLDefinitions): Output {
-        var kotlin = """
-package ${wsdl.packageName}
+        var kotlin = """package ${wsdl.packageName}
         """.trimEnd(' ')
 
         kotlin += """
@@ -98,7 +97,7 @@ ${if (complexType?.isFinal == true) { "" } else { "open "}}class ${wsdl.service.
         """.trimEnd()
         complexType?.sequence?.elements?.forEach {
             kotlin += """
-                XMLParam("$namespace", "${it.name}", ${it.safeName}, ${it.kclassInKotlin(wsdl.service, complexType)}),
+            XMLParam("$namespace", "${it.name}", ${it.safeName}, ${it.kclassInKotlin(wsdl.service, complexType)}),
             """.trimEnd()
         }
         kotlin += """
