@@ -26,7 +26,7 @@ class SampleService_echoString : XSDType() {
 
     override fun xmlParams(): Array<XMLParam> {
         return arrayOf(
-            XMLParam("", "arg0", arg0, String::class),
+            XMLParam("", "arg0", arg0, String::class)
         )
     }
 
@@ -40,7 +40,7 @@ class SampleService_echoStringResponse : XSDType() {
 
     override fun xmlParams(): Array<XMLParam> {
         return arrayOf(
-            XMLParam("", "return", `return`, String::class),
+            XMLParam("", "return", `return`, String::class)
         )
     }
 
