@@ -211,7 +211,6 @@ abstract class WSDLService() {
     protected val interceptors = mutableListOf<Interceptor>()
 
     protected inline fun <I : XSDType, reified O : XSDType> requestGeneric(i: I): O {
-
         val soapRequest = i.soapRequest(targetNamespace)
 
         val requestBody = object : RequestBody() {
