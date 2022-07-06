@@ -210,6 +210,9 @@ abstract class WSDLService() {
 
     protected val interceptors = mutableListOf<Interceptor>()
 
+    protected val requestUrl: String
+        get() = endpoint.removeSuffix("/") + "/" + path.removePrefix("/")
+
     protected inline fun <I : XSDType, reified O : XSDType> requestGeneric(i: I): O {
         val soapRequest = i.soapRequest(targetNamespace)
 
@@ -225,7 +228,7 @@ abstract class WSDLService() {
         }
 
         val request = Request.Builder()
-            .url("$endpoint/$path")
+            .url(requestUrl)
             .post(requestBody)
             .build()
         val client = OkHttpClient.Builder()
