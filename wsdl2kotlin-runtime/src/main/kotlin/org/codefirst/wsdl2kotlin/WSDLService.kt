@@ -25,7 +25,7 @@ data class XMLParam(
     val namespace: String,
     val name: String,
     val value: Any?,
-    val clazz: KClass<*>
+    val clazz: KClass<*>,
 )
 
 class SOAPFaultException(faultString: String) : RuntimeException(faultString)
@@ -222,7 +222,7 @@ abstract class WSDLService() {
             override fun writeTo(sink: BufferedSink) {
                 DocumentHelper.newTransformer().transform(
                     DOMSource(soapRequest),
-                    StreamResult(FixSurrogatePairOutputStream(sink.outputStream()))
+                    StreamResult(FixSurrogatePairOutputStream(sink.outputStream())),
                 )
             }
         }
