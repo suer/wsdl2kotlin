@@ -30,7 +30,7 @@ jobs:
       - name: Build wsdl2kotlin
         run: |
           cd wsdl2kotlin
-          ../gradlew test build install
+          ../gradlew test build publishToMavenLocal
       - name: Build wsdl2kotlin-runtime
         run: |
           cd wsdl2kotlin-runtime
