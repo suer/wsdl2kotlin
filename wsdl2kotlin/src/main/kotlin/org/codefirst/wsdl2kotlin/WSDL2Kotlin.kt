@@ -1,6 +1,6 @@
 package org.codefirst.wsdl2kotlin
 
-class WSDL2Kotlin() {
+class WSDL2Kotlin {
     fun run(vararg paths: String): Array<Output> {
         val wsdls = mutableListOf<WSDLDefinitions>()
         paths.forEach {

@@ -37,9 +37,6 @@ class WSDLOutput {
 }
 
 class WSDLOperation {
-    @JacksonXmlProperty(isAttribute = true)
-    var name: String = ""
-
     lateinit var input: WSDLInput
 
     lateinit var output: WSDLOutput
@@ -57,13 +54,7 @@ class WSDLTypes {
 
 class WSDLPart {
     @JacksonXmlProperty(isAttribute = true)
-    var name: String = ""
-
-    @JacksonXmlProperty(isAttribute = true)
     var element: String? = null
-
-    @JacksonXmlProperty(isAttribute = true)
-    var type: String? = null
 }
 
 class WSDLMessage {

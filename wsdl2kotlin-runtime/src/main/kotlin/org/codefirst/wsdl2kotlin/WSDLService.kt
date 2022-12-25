@@ -203,7 +203,7 @@ abstract class XSDType {
     }
 }
 
-abstract class WSDLService() {
+abstract class WSDLService {
     abstract val targetNamespace: String
     abstract var endpoint: String
     abstract var path: String
