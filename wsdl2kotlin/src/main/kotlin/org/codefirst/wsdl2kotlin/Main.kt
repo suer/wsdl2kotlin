@@ -10,8 +10,8 @@ import com.github.ajalt.clikt.parameters.types.path
 import java.nio.file.Path
 
 class Main : CliktCommand() {
-    val dir: String by option("-d", "--dir", help = "output directory").default("./")
-    val paths: Set<Path> by argument().path(mustExist = true).multiple().unique()
+    private val dir: String by option("-d", "--dir", help = "output directory").default("./")
+    private val paths: Set<Path> by argument().path(mustExist = true).multiple().unique()
 
     override fun run() {
         val outputs = WSDL2Kotlin().run(*paths.map { it.toString() }.toTypedArray())

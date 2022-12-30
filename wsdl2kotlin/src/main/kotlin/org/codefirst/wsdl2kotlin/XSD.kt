@@ -64,7 +64,7 @@ class XSDElement {
     @JacksonXmlProperty(isAttribute = true)
     var maxOccurs: String? = null
 
-    val safeName: String?
+    val safeName: String
         get() {
             // https://kotlinlang.org/docs/keyword-reference.html#soft-keywords
             val keywords = arrayListOf("return", "operator", "var", "val", "out")
@@ -74,7 +74,7 @@ class XSDElement {
             return name
         }
 
-    fun typeInKotlin(service: WSDLService, parentType: XSDComplexType?): String? {
+    fun typeInKotlin(service: WSDLService, parentType: XSDComplexType?): String {
         val kotlinTypeName = baseTypeInKotlin(service, parentType)
 
         if (maxOccurs == "unbounded") {
@@ -99,7 +99,7 @@ class XSDElement {
         }
     }
 
-    fun kclassInKotlin(service: WSDLService, parentType: XSDComplexType?): String? {
+    fun kclassInKotlin(service: WSDLService, parentType: XSDComplexType?): String {
         val kotlinTypeName = baseTypeInKotlin(service, parentType)
 
         if (maxOccurs == "unbounded") {
