@@ -15,7 +15,6 @@ plugins {
 
     id "org.jetbrains.kotlin.kapt" version "1.7.21"
 
-    id 'maven'
     id 'maven-publish'
 }
 
