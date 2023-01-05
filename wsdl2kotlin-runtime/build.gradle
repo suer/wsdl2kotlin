@@ -8,7 +8,7 @@
 
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
-    id 'org.jetbrains.kotlin.jvm' version '1.8.0'
+    id 'org.jetbrains.kotlin.jvm' version '1.7.21'
 
     // Apply the java-library plugin for API and implementation separation.
     id 'java-library'
@@ -34,7 +34,7 @@ dependencies {
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation 'com.google.guava:guava:31.1-jre'
 
-    implementation 'org.jetbrains.kotlin:kotlin-reflect:1.8.0'
+    implementation 'org.jetbrains.kotlin:kotlin-reflect:1.7.21'
 
     // Use the Kotlin test library.
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
