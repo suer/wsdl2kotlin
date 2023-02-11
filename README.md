@@ -9,7 +9,7 @@ Inspired by [WSDL2Swift](https://github.com/banjun/WSDL2Swift)
 
 Add maven repository to `build.gradle`:
 
-```
+```gradle:build.gradle
 buildscript {
     repositories {
         maven {
@@ -25,9 +25,9 @@ buildscript {
 
 ```
 
-then, add plugin configuration:
+Then, add plugin configuration:
 
-```
+```gradle:build.gradle
 apply plugin: 'org.codefirst.wsdl2kotlin.wsdl2kotlin-gradle-plugin'
 wsdl2kotlin {
     // path to WSDL and XSD files
@@ -43,6 +43,13 @@ Generate codes by:
 $ ./gradlew wsdl2kotlin
 ```
 
+Finally, append `wsdl2kotlin-runtime` to `app/build.gradle`:
+
+```gradle:app/build.gradle
+dependencies {
+    implementation 'org.codefirst.wsdl2kotlin:wsdl2kotlin-runtime:0.3.0'
+}
+```
 
 # for developers
 
