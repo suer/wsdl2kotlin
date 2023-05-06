@@ -21,7 +21,7 @@ class SampleService : WSDLService() {
     }
 }
 
-class SampleService_echoString : XSDType() {
+class SampleService_echoString : XSDType() { // ktlint-disable standard:class-naming
     var arg0: String? = null
 
     override fun xmlParams(): Array<XMLParam> {
@@ -35,7 +35,7 @@ class SampleService_echoString : XSDType() {
     }
 }
 
-class SampleService_echoStringResponse : XSDType() {
+class SampleService_echoStringResponse : XSDType() { // ktlint-disable standard:class-naming
     var `return`: String? = null
 
     override fun xmlParams(): Array<XMLParam> {
