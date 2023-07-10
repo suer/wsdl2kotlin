@@ -14,7 +14,7 @@ repositories {
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib'
     implementation gradleApi()
-    implementation 'org.codefirst.wsdl2kotlin:wsdl2kotlin:0.4.0-SNAPSHOT'
+    implementation 'org.codefirst.wsdl2kotlin:wsdl2kotlin:0.4.0'
 }
 
 gradlePlugin {
@@ -29,7 +29,7 @@ gradlePlugin {
 }
 
 group 'org.codefirst.wsdl2kotlin'
-version = '0.4.0-SNAPSHOT'
+version = '0.4.0'
 
 publishing {
     repositories {
