@@ -21,7 +21,8 @@ class SampleService : WSDLService() {
     }
 }
 
-class SampleService_echoString : XSDType() { // ktlint-disable standard:class-naming
+@Suppress("ktlint:standard:class-naming")
+class SampleService_echoString : XSDType() {
     var arg0: String? = null
 
     override fun xmlParams(): Array<XMLParam> {
@@ -35,7 +36,8 @@ class SampleService_echoString : XSDType() { // ktlint-disable standard:class-na
     }
 }
 
-class SampleService_echoStringResponse : XSDType() { // ktlint-disable standard:class-naming
+@Suppress("ktlint:standard:class-naming")
+class SampleService_echoStringResponse : XSDType() {
     var `return`: String? = null
 
     override fun xmlParams(): Array<XMLParam> {
