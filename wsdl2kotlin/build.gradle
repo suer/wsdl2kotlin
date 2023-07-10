@@ -37,7 +37,7 @@ dependencies {
     implementation 'com.google.guava:guava:32.1.1-jre'
 
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2"
-    implementation "com.github.ajalt.clikt:clikt:3.5.2"
+    implementation "com.github.ajalt.clikt:clikt:4.0.0"
 
     // Use the Kotlin test library.
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
