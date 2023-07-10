@@ -6,6 +6,10 @@ updates:
       interval: "weekly"
       timezone: "Asia/Tokyo"
       day: "friday"
+    groups:
+      org.jetbrains.kotlin:
+        patterns:
+          - "org.jetbrains.kotlin.*"
 
   - package-ecosystem: "gradle"
     directory: "/wsdl2kotlin-runtime/"
