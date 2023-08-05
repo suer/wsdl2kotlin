@@ -34,7 +34,7 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib'
 
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
-    implementation 'com.google.guava:guava:32.1.1-jre'
+    implementation 'com.google.guava:guava:32.1.2-jre'
 
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2"
     implementation "com.github.ajalt.clikt:clikt:4.0.0"
