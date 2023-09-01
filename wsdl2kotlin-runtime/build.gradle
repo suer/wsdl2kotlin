@@ -42,7 +42,7 @@ dependencies {
     // Use the Kotlin JUnit integration.
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
 
-    testImplementation 'com.github.tomakehurst:wiremock-standalone:2.27.2'
+    testImplementation 'com.github.tomakehurst:wiremock-standalone:3.0.0'
 
     implementation 'com.squareup.okhttp3:okhttp:4.11.0'
 
