@@ -5,7 +5,6 @@ import java.io.OutputStream
 
 // to fix https://bugs.openjdk.java.net/browse/JDK-8203810
 class FixSurrogatePairOutputStream(private val outputStream: OutputStream) : OutputStream() {
-
     private val buffer = ByteArrayOutputStream()
 
     private var inNumericalCharacterReferences = false
@@ -27,10 +26,11 @@ class FixSurrogatePairOutputStream(private val outputStream: OutputStream) : Out
                 val numericalCharacterReferences = buffer.toString()
 
                 // 55360
-                val charCode = numericalCharacterReferences
-                    .removePrefix("&#")
-                    .removeSuffix(";")
-                    .toIntOrNull()
+                val charCode =
+                    numericalCharacterReferences
+                        .removePrefix("&#")
+                        .removeSuffix(";")
+                        .toIntOrNull()
 
                 if (charCode == null) {
                     highChar = 0

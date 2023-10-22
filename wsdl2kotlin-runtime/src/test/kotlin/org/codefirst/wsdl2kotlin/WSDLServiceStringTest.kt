@@ -38,6 +38,7 @@ class SampleService_echoString : XSDType() {
 
 @Suppress("ktlint:standard:class-naming")
 class SampleService_echoStringResponse : XSDType() {
+    @Suppress("ktlint:standard:property-naming")
     var `return`: String? = null
 
     override fun xmlParams(): Array<XMLParam> {
@@ -52,19 +53,19 @@ class SampleService_echoStringResponse : XSDType() {
 }
 
 class WSDLServiceStringTest {
-
     @Rule
     @JvmField
     var wireMockRule = WireMockRule(18080)
 
     @Before
     fun setup() {
-        val responseBody = """<?xml version='1.0' encoding='UTF-8'?>
+        val responseBody =
+            """<?xml version='1.0' encoding='UTF-8'?>
             |<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
             |<S:Body><ns2:echoStringResponse xmlns:ns2="http://service.sample.codefirst.org/">
             |<return>test</return></ns2:echoStringResponse></S:Body>
             |</S:Envelope>
-        """.trimMargin()
+            """.trimMargin()
 
         stubFor(
             post(urlEqualTo("/service"))
