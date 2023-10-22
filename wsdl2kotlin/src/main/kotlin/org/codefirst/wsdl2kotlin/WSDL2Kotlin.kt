@@ -19,10 +19,12 @@ class WSDL2Kotlin {
     }
 
     private fun generateOutput(wsdl: WSDLDefinitions): Output {
-        var kotlin = """package ${wsdl.packageName}
+        var kotlin =
+            """package ${wsdl.packageName}
         """.trimEnd(' ')
 
-        kotlin += """
+        kotlin +=
+            """
 import org.codefirst.wsdl2kotlin.WSDLService
 import org.codefirst.wsdl2kotlin.XMLParam
 import org.codefirst.wsdl2kotlin.XSDType
@@ -33,7 +35,8 @@ import org.w3c.dom.Element
         val endpoint = location?.substringBeforeLast("/")
         val path = location?.substringAfterLast("/")
 
-        kotlin += """
+        kotlin +=
+            """
 class ${wsdl.service.name} : WSDLService() {
     override val targetNamespace = "${wsdl.targetNamespace}"
     override var endpoint = "$endpoint"
@@ -44,7 +47,8 @@ class ${wsdl.service.name} : WSDLService() {
                 val inputType = wsdl.findType(operation.input.message)
                 val outputType = wsdl.findType(operation.output.message)
                 if (inputType != null && outputType != null) {
-                    kotlin += """
+                    kotlin +=
+                        """
     fun request(parameters: $inputType): $outputType {
         return requestGeneric<$inputType, $outputType>(parameters)
     }
@@ -53,7 +57,8 @@ class ${wsdl.service.name} : WSDLService() {
             }
         }
 
-        kotlin += """
+        kotlin +=
+            """
 }
         """.trimEnd(' ')
         wsdl.types.schema.complexTypes.forEach { complexType ->
@@ -67,7 +72,12 @@ class ${wsdl.service.name} : WSDLService() {
         return Output(wsdl.service.name, wsdl.packageName, kotlin)
     }
 
-    private fun generateType(name: String, wsdl: WSDLDefinitions, complexType: XSDComplexType?, namespace: String): String {
+    private fun generateType(
+        name: String,
+        wsdl: WSDLDefinitions,
+        complexType: XSDComplexType?,
+        namespace: String,
+    ): String {
         var kotlin = ""
 
         val subClassSequence = complexType?.complexContent?.extension?.sequence
@@ -80,42 +90,59 @@ class ${wsdl.service.name} : WSDLService() {
             kotlin += generateType("${name}_${it.name}", wsdl, it.complexType, namespace)
         }
 
-        kotlin += """
-${if (complexType?.isFinal == true) { "" } else { "open "}}class ${wsdl.service.name}_$name : ${complexType?.baseTypeInKotlin(wsdl.service) ?: "XSDType"}() {
+        val classDecorator =
+            if (complexType?.isFinal == true) {
+                ""
+            } else {
+                "open "
+            }
+        kotlin +=
+            """${classDecorator}class ${wsdl.service.name}_$name : ${complexType?.baseTypeInKotlin(wsdl.service) ?: "XSDType"}() {
         """.trimEnd()
         complexType?.sequence?.elements?.forEach {
-            kotlin += """
+            kotlin +=
+                """
     var ${it.safeName}: ${it.typeInKotlin(wsdl.service, complexType)} = ${it.initialValue(wsdl.service, complexType)}
             """.trimEnd()
         }
 
-        kotlin += """
+        kotlin +=
+            """
 
     override fun xmlParams(): Array<XMLParam> {
-        return ${if (complexType?.isExtended == true) { "super.xmlParams() + " } else { "" }}arrayOf(
+        return ${if (complexType?.isExtended == true) {
+                "super.xmlParams() + "
+            } else {
+                ""
+            }}arrayOf(
         """.trimEnd()
         complexType?.sequence?.elements?.forEach {
-            kotlin += """
+            kotlin +=
+                """
             XMLParam("$namespace", "${it.name}", ${it.safeName}, ${it.kclassInKotlin(wsdl.service, complexType)}),
             """.trimEnd()
         }
-        kotlin += """
+        kotlin +=
+            """
         )
     }
 
     override fun readSOAPEnvelope(bodyElement: Element) {
         """.trimEnd()
         if (complexType?.isExtended == true) {
-            kotlin += """
+            kotlin +=
+                """
         super.readSOAPEnvelope(bodyElement)
             """.trimEnd()
         }
         complexType?.sequence?.elements?.forEach {
-            kotlin += """
+            kotlin +=
+                """
         ${it.safeName} = ${it.readMethod()}(bodyElement, "${it.name}", ${it.kclassInKotlin(wsdl.service, complexType)})
             """.trimEnd()
         }
-        kotlin += """
+        kotlin +=
+            """
     }
 }
         """.trimEnd(' ')

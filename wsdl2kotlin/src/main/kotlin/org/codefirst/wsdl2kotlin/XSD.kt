@@ -74,7 +74,10 @@ class XSDElement {
             return name
         }
 
-    fun typeInKotlin(service: WSDLService, parentType: XSDComplexType?): String {
+    fun typeInKotlin(
+        service: WSDLService,
+        parentType: XSDComplexType?,
+    ): String {
         val kotlinTypeName = baseTypeInKotlin(service, parentType)
 
         if (maxOccurs == "unbounded") {
@@ -99,7 +102,10 @@ class XSDElement {
         }
     }
 
-    fun kclassInKotlin(service: WSDLService, parentType: XSDComplexType?): String {
+    fun kclassInKotlin(
+        service: WSDLService,
+        parentType: XSDComplexType?,
+    ): String {
         val kotlinTypeName = baseTypeInKotlin(service, parentType)
 
         if (maxOccurs == "unbounded") {
@@ -109,7 +115,10 @@ class XSDElement {
         return "$kotlinTypeName::class"
     }
 
-    fun initialValue(service: WSDLService, parentType: XSDComplexType?): String {
+    fun initialValue(
+        service: WSDLService,
+        parentType: XSDComplexType?,
+    ): String {
         val kotlinTypeName = baseTypeInKotlin(service, parentType)
 
         if (maxOccurs == "unbounded") {
@@ -133,14 +142,22 @@ class XSDElement {
         }
     }
 
-    private fun baseTypeInKotlin(service: WSDLService, parentType: XSDComplexType?): String {
+    private fun baseTypeInKotlin(
+        service: WSDLService,
+        parentType: XSDComplexType?,
+    ): String {
         return TypeResolver.baseTypeInKotlin(this.name, this.type, service, parentType)
     }
 }
 
 private class TypeResolver {
     companion object {
-        fun baseTypeInKotlin(name: String, type: String?, service: WSDLService, parentType: XSDComplexType?): String {
+        fun baseTypeInKotlin(
+            name: String,
+            type: String?,
+            service: WSDLService,
+            parentType: XSDComplexType?,
+        ): String {
             if (type == null) {
                 return service.name + "_" + parentType?.name + "_" + name
             }
