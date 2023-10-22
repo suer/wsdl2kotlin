@@ -46,7 +46,10 @@ class DocumentHelper {
             }
         }
 
-        fun getChildElementsByTagName(parentElement: Element, tagName: String): List<Element> {
+        fun getChildElementsByTagName(
+            parentElement: Element,
+            tagName: String,
+        ): List<Element> {
             val items = parentElement.childNodes
             val nodes = mutableListOf<Element>()
             for (i in 0 until items.length) {
@@ -83,15 +86,19 @@ abstract class XSDType {
         return document
     }
 
-    private fun xmlElements(name: String, document: Document): Array<Element> {
+    private fun xmlElements(
+        name: String,
+        document: Document,
+    ): Array<Element> {
         val typeElement = document.createElement(name)
 
         xmlParams().forEach { param ->
-            val name = if (param.namespace.isBlank()) {
-                param.name
-            } else {
-                "${param.namespace}:${param.name}"
-            }
+            val name =
+                if (param.namespace.isBlank()) {
+                    param.name
+                } else {
+                    "${param.namespace}:${param.name}"
+                }
             xmlElements(param.value, name, document).forEach {
                 typeElement.appendChild(it)
             }
@@ -100,7 +107,11 @@ abstract class XSDType {
         return arrayOf(typeElement)
     }
 
-    private fun xmlElements(value: Any?, name: String, document: Document): Array<Element> {
+    private fun xmlElements(
+        value: Any?,
+        name: String,
+        document: Document,
+    ): Array<Element> {
         val element = document.createElement(name)
         when (value) {
             is java.util.Date -> element.textContent = SimpleDateFormat(DATETIME_FORMAT).format(value)
@@ -122,7 +133,11 @@ abstract class XSDType {
 
     abstract fun readSOAPEnvelope(bodyElement: Element)
 
-    protected fun <T : Any> readSOAPEnvelopeField(parentElement: Element, tagName: String, clazz: KClass<T>): T {
+    protected fun <T : Any> readSOAPEnvelopeField(
+        parentElement: Element,
+        tagName: String,
+        clazz: KClass<T>,
+    ): T {
         return readSOAPEnvelopeFieldNullable(parentElement, tagName, clazz)!!
     }
 
@@ -133,7 +148,11 @@ abstract class XSDType {
         }
     }
 
-    protected fun <T : Any> readSOAPEnvelopeFieldNullable(parentElement: Element, tagName: String, clazz: KClass<T>): T? {
+    protected fun <T : Any> readSOAPEnvelopeFieldNullable(
+        parentElement: Element,
+        tagName: String,
+        clazz: KClass<T>,
+    ): T? {
         val items = DocumentHelper.getChildElementsByTagName(parentElement, tagName)
         if (items.isEmpty()) {
             return null
@@ -167,8 +186,9 @@ abstract class XSDType {
             return arr as T
         }
 
-        val t = clazz.java.newInstance() as? XSDType
-            ?: throw NotImplementedError("Unsupported type: ${clazz.simpleName}")
+        val t =
+            clazz.java.newInstance() as? XSDType
+                ?: throw NotImplementedError("Unsupported type: ${clazz.simpleName}")
         val properties = t.javaClass.kotlin.memberProperties
 
         val item = items.first()
@@ -184,7 +204,10 @@ abstract class XSDType {
         return t as T
     }
 
-    private fun <T : Any> singleNodeToObject(item: Node, clazz: KClass<T>): T {
+    private fun <T : Any> singleNodeToObject(
+        item: Node,
+        clazz: KClass<T>,
+    ): T {
         return when (clazz) {
             String::class -> item.textContent
             Boolean::class -> item.textContent.equals("true", ignoreCase = true)
@@ -194,8 +217,9 @@ abstract class XSDType {
             java.util.Date::class -> SimpleDateFormat(DATETIME_FORMAT).parse(item.textContent)
             ByteArray::class -> java.util.Base64.getDecoder().decode(item.textContent)
             else -> {
-                val t = clazz.java.newInstance() as? XSDType
-                    ?: throw NotImplementedError("Unsupported type: ${clazz.simpleName}")
+                val t =
+                    clazz.java.newInstance() as? XSDType
+                        ?: throw NotImplementedError("Unsupported type: ${clazz.simpleName}")
                 t.readSOAPEnvelope(item as Element)
                 return t as T
             }
@@ -216,28 +240,31 @@ abstract class WSDLService {
     protected inline fun <I : XSDType, reified O : XSDType> requestGeneric(i: I): O {
         val soapRequest = i.soapRequest(targetNamespace)
 
-        val requestBody = object : RequestBody() {
-            override fun contentType() = "text/xml".toMediaTypeOrNull()
+        val requestBody =
+            object : RequestBody() {
+                override fun contentType() = "text/xml".toMediaTypeOrNull()
 
-            override fun writeTo(sink: BufferedSink) {
-                DocumentHelper.newTransformer().transform(
-                    DOMSource(soapRequest),
-                    StreamResult(FixSurrogatePairOutputStream(sink.outputStream())),
-                )
-            }
-        }
-
-        val request = Request.Builder()
-            .url(requestUrl)
-            .post(requestBody)
-            .build()
-        val client = OkHttpClient.Builder()
-            .also { builder ->
-                interceptors.forEach {
-                    builder.addInterceptor(it)
+                override fun writeTo(sink: BufferedSink) {
+                    DocumentHelper.newTransformer().transform(
+                        DOMSource(soapRequest),
+                        StreamResult(FixSurrogatePairOutputStream(sink.outputStream())),
+                    )
                 }
             }
-            .build()
+
+        val request =
+            Request.Builder()
+                .url(requestUrl)
+                .post(requestBody)
+                .build()
+        val client =
+            OkHttpClient.Builder()
+                .also { builder ->
+                    interceptors.forEach {
+                        builder.addInterceptor(it)
+                    }
+                }
+                .build()
         val response = client.newCall(request).execute()
 
         val document = DocumentHelper.newDocumentBuilder().parse(response.body?.byteStream())

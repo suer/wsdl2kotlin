@@ -5,8 +5,10 @@ import java.io.ByteArrayOutputStream
 import kotlin.test.assertEquals
 
 class FixSurrogatePairOutputStreamTest {
-
-    private fun assertStream(input: String, output: String) {
+    private fun assertStream(
+        input: String,
+        output: String,
+    ) {
         val byteStream = ByteArrayOutputStream()
         val stream = FixSurrogatePairOutputStream(byteStream)
         stream.bufferedWriter().use {
