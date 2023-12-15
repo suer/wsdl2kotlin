@@ -40,7 +40,7 @@ jobs:
           cd wsdl2kotlin-gradle-plugin
           ../gradlew test build
       - name: Upload jar files
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: jar
           path: |
