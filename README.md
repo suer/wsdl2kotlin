@@ -47,7 +47,7 @@ Finally, append `wsdl2kotlin-runtime` to `app/build.gradle`:
 
 ```gradle:app/build.gradle
 dependencies {
-    implementation 'org.codefirst.wsdl2kotlin:wsdl2kotlin-runtime:0.5.0'
+    implementation 'org.codefirst.wsdl2kotlin:wsdl2kotlin-runtime:0.6.0'
 }
 ```
 
