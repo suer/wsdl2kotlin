@@ -43,7 +43,7 @@ dependencies {
     // Use the Kotlin JUnit integration.
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
 
-    ktlint "com.pinterest:ktlint:0.51.0-FINAL"
+    ktlint "com.pinterest.ktlint:ktlint-cli:1.0.0"
 }
 
 java {
