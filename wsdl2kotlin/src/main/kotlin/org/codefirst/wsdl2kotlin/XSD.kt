@@ -90,17 +90,14 @@ class XSDElement {
         return kotlinTypeName
     }
 
-    private fun isNullable(): Boolean {
-        return maxOccurs == "unbounded" || minOccurs == 0
-    }
+    private fun isNullable(): Boolean = maxOccurs == "unbounded" || minOccurs == 0
 
-    fun readMethod(): String {
-        return if (isNullable()) {
+    fun readMethod(): String =
+        if (isNullable()) {
             "readSOAPEnvelopeFieldNullable"
         } else {
             "readSOAPEnvelopeField"
         }
-    }
 
     fun kclassInKotlin(
         service: WSDLService,
@@ -145,9 +142,7 @@ class XSDElement {
     private fun baseTypeInKotlin(
         service: WSDLService,
         parentType: XSDComplexType?,
-    ): String {
-        return TypeResolver.baseTypeInKotlin(this.name, this.type, service, parentType)
-    }
+    ): String = TypeResolver.baseTypeInKotlin(this.name, this.type, service, parentType)
 }
 
 private class TypeResolver {

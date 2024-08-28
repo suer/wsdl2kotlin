@@ -98,7 +98,12 @@ class WSDLDefinitions {
     }
 
     val packageName: String
-        get() = URI(targetNamespace).host.split('.').reversed().joinToString(".")
+        get() =
+            URI(targetNamespace)
+                .host
+                .split('.')
+                .reversed()
+                .joinToString(".")
 }
 
 class WSDL {
