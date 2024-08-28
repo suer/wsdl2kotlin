@@ -4,7 +4,9 @@ import java.io.ByteArrayOutputStream
 import java.io.OutputStream
 
 // to fix https://bugs.openjdk.java.net/browse/JDK-8203810
-class FixSurrogatePairOutputStream(private val outputStream: OutputStream) : OutputStream() {
+class FixSurrogatePairOutputStream(
+    private val outputStream: OutputStream,
+) : OutputStream() {
     private val buffer = ByteArrayOutputStream()
 
     private var inNumericalCharacterReferences = false

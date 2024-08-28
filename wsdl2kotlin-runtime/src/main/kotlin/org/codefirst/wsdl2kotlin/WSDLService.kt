@@ -28,23 +28,25 @@ data class XMLParam(
     val clazz: KClass<*>,
 )
 
-class SOAPFaultException(faultString: String) : RuntimeException(faultString)
+class SOAPFaultException(
+    faultString: String,
+) : RuntimeException(faultString)
 
 const val DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssX:00"
 
 class DocumentHelper {
     companion object {
-        fun newDocumentBuilder(): DocumentBuilder {
-            return DocumentBuilderFactory.newInstance().apply {
-                this.isNamespaceAware = true
-            }.newDocumentBuilder()
-        }
+        fun newDocumentBuilder(): DocumentBuilder =
+            DocumentBuilderFactory
+                .newInstance()
+                .apply {
+                    this.isNamespaceAware = true
+                }.newDocumentBuilder()
 
-        fun newTransformer(): Transformer {
-            return TransformerFactory.newInstance().newTransformer().apply {
+        fun newTransformer(): Transformer =
+            TransformerFactory.newInstance().newTransformer().apply {
                 this.setOutputProperty(OutputKeys.INDENT, "yes")
             }
-        }
 
         fun getChildElementsByTagName(
             parentElement: Element,
@@ -115,7 +117,11 @@ abstract class XSDType {
         val element = document.createElement(name)
         when (value) {
             is java.util.Date -> element.textContent = SimpleDateFormat(DATETIME_FORMAT).format(value)
-            is ByteArray -> element.textContent = java.util.Base64.getEncoder().encodeToString(value)
+            is ByteArray ->
+                element.textContent =
+                    java.util.Base64
+                        .getEncoder()
+                        .encodeToString(value)
             is Array<*> -> return value.map { xmlElements(it, name, document).first() }.toTypedArray()
             is XSDType -> {
                 value.xmlParams().forEach { param ->
@@ -137,16 +143,13 @@ abstract class XSDType {
         parentElement: Element,
         tagName: String,
         clazz: KClass<T>,
-    ): T {
-        return readSOAPEnvelopeFieldNullable(parentElement, tagName, clazz)!!
-    }
+    ): T = readSOAPEnvelopeFieldNullable(parentElement, tagName, clazz)!!
 
-    private fun <T : Any> isSingleType(clazz: KClass<T>): Boolean {
-        return when (clazz) {
+    private fun <T : Any> isSingleType(clazz: KClass<T>): Boolean =
+        when (clazz) {
             String::class, Boolean::class, Int::class, Float::class, Long::class, java.util.Date::class, ByteArray::class -> true
             else -> false
         }
-    }
 
     protected fun <T : Any> readSOAPEnvelopeFieldNullable(
         parentElement: Element,
@@ -179,9 +182,12 @@ abstract class XSDType {
                 } as T
             }
 
-            val arr = java.lang.reflect.Array.newInstance(k.java, items.size)
+            val arr =
+                java.lang.reflect.Array
+                    .newInstance(k.java, items.size)
             items.forEachIndexed { i, item ->
-                java.lang.reflect.Array.set(arr, i, singleNodeToObject(item, k))
+                java.lang.reflect.Array
+                    .set(arr, i, singleNodeToObject(item, k))
             }
             return arr as T
         }
@@ -215,7 +221,10 @@ abstract class XSDType {
             Float::class -> item.textContent.toFloat()
             Long::class -> item.textContent.toLong()
             java.util.Date::class -> SimpleDateFormat(DATETIME_FORMAT).parse(item.textContent)
-            ByteArray::class -> java.util.Base64.getDecoder().decode(item.textContent)
+            ByteArray::class ->
+                java.util.Base64
+                    .getDecoder()
+                    .decode(item.textContent)
             else -> {
                 val t =
                     clazz.java.newInstance() as? XSDType
@@ -253,18 +262,19 @@ abstract class WSDLService {
             }
 
         val request =
-            Request.Builder()
+            Request
+                .Builder()
                 .url(requestUrl)
                 .post(requestBody)
                 .build()
         val client =
-            OkHttpClient.Builder()
+            OkHttpClient
+                .Builder()
                 .also { builder ->
                     interceptors.forEach {
                         builder.addInterceptor(it)
                     }
-                }
-                .build()
+                }.build()
         val response = client.newCall(request).execute()
 
         val document = DocumentHelper.newDocumentBuilder().parse(response.body?.byteStream())
