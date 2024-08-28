@@ -26,7 +26,7 @@ configurations {
 
 dependencies {
     // Align versions of all Kotlin components
-    implementation platform('org.jetbrains.kotlin:kotlin-bom')
+    implementation platform('org.jetbrains.kotlin:kotlin-bom:2.0.10')
 
     // Use the Kotlin standard library.
     implementation 'org.jetbrains.kotlin:kotlin-stdlib'

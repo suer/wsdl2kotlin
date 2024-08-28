@@ -6,6 +6,11 @@ updates:
       interval: "weekly"
       timezone: "Asia/Tokyo"
       day: "friday"
+    groups:
+      kotlin:
+        patterns:
+          - "org.jetbrains.kotlin.jvm"
+          - "org.jetbrains.kotlin:kotlin-bom"
 
   - package-ecosystem: "gradle"
     directory: "/wsdl2kotlin-runtime/"
@@ -13,6 +18,11 @@ updates:
       interval: "weekly"
       timezone: "Asia/Tokyo"
       day: "friday"
+    groups:
+      kotlin:
+        patterns:
+          - "org.jetbrains.kotlin.jvm"
+          - "org.jetbrains.kotlin:kotlin-bom"
 
   - package-ecosystem: "gradle"
     directory: "/wsdl2kotlin-gradle-plugin/"
@@ -20,6 +30,11 @@ updates:
       interval: "weekly"
       timezone: "Asia/Tokyo"
       day: "friday"
+    groups:
+      kotlin:
+        patterns:
+          - "org.jetbrains.kotlin.jvm"
+          - "org.jetbrains.kotlin:kotlin-stdlib"
 
   - package-ecosystem: "github-actions"
     directory: "/"
