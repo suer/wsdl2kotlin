@@ -6,16 +6,23 @@ class WSDL2Kotlin {
         paths.forEach {
             if (XSD.isXSD(it)) {
                 val xsd = XSD.parse(it)
-                wsdls.last().types.schema.elements.addAll(xsd.elements)
-                wsdls.last().types.schema.complexTypes.addAll(xsd.complexTypes)
+                wsdls
+                    .last()
+                    .types.schema.elements
+                    .addAll(xsd.elements)
+                wsdls
+                    .last()
+                    .types.schema.complexTypes
+                    .addAll(xsd.complexTypes)
             } else {
                 wsdls.add(WSDL.parse(it))
             }
         }
 
-        return wsdls.map {
-            generateOutput(it)
-        }.toTypedArray()
+        return wsdls
+            .map {
+                generateOutput(it)
+            }.toTypedArray()
     }
 
     private fun generateOutput(wsdl: WSDLDefinitions): Output {
@@ -31,7 +38,11 @@ import org.codefirst.wsdl2kotlin.XSDType
 import org.w3c.dom.Element
         """.trimEnd(' ')
 
-        val location = wsdl.service.ports.first { it.address != null }.address?.location
+        val location =
+            wsdl.service.ports
+                .first { it.address != null }
+                .address
+                ?.location
         val endpoint = location?.substringBeforeLast("/")
         val path = location?.substringAfterLast("/")
 
