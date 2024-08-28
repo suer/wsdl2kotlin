@@ -16,20 +16,18 @@ class SampleService : WSDLService() {
     override var endpoint = "http://localhost:18080"
     override var path = "service"
 
-    fun request(parameters: SampleService_echoString): SampleService_echoStringResponse {
-        return requestGeneric<SampleService_echoString, SampleService_echoStringResponse>(parameters)
-    }
+    fun request(parameters: SampleService_echoString): SampleService_echoStringResponse =
+        requestGeneric<SampleService_echoString, SampleService_echoStringResponse>(parameters)
 }
 
 @Suppress("ktlint:standard:class-naming")
 class SampleService_echoString : XSDType() {
     var arg0: String? = null
 
-    override fun xmlParams(): Array<XMLParam> {
-        return arrayOf(
+    override fun xmlParams(): Array<XMLParam> =
+        arrayOf(
             XMLParam("", "arg0", arg0, String::class),
         )
-    }
 
     override fun readSOAPEnvelope(bodyElement: Element) {
         arg0 = readSOAPEnvelopeFieldNullable(bodyElement, "arg0", String::class)
@@ -41,11 +39,10 @@ class SampleService_echoStringResponse : XSDType() {
     @Suppress("ktlint:standard:property-naming")
     var `return`: String? = null
 
-    override fun xmlParams(): Array<XMLParam> {
-        return arrayOf(
+    override fun xmlParams(): Array<XMLParam> =
+        arrayOf(
             XMLParam("", "return", `return`, String::class),
         )
-    }
 
     override fun readSOAPEnvelope(bodyElement: Element) {
         `return` = readSOAPEnvelopeFieldNullable(bodyElement, "return", String::class)
