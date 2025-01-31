@@ -1,7 +1,10 @@
 version: 2
 updates:
   - package-ecosystem: "gradle"
-    directory: "/wsdl2kotlin/"
+    directories:
+      - "/wsdl2kotlin/"
+      - "/wsdl2kotlin-runtime/"
+      - "/wsdl2kotlin-gradle-plugin/"
     schedule:
       interval: "weekly"
       timezone: "Asia/Tokyo"
@@ -11,29 +14,6 @@ updates:
         patterns:
           - "org.jetbrains.kotlin.jvm"
           - "org.jetbrains.kotlin:kotlin-bom"
-
-  - package-ecosystem: "gradle"
-    directory: "/wsdl2kotlin-runtime/"
-    schedule:
-      interval: "weekly"
-      timezone: "Asia/Tokyo"
-      day: "friday"
-    groups:
-      kotlin:
-        patterns:
-          - "org.jetbrains.kotlin.jvm"
-          - "org.jetbrains.kotlin:kotlin-bom"
-
-  - package-ecosystem: "gradle"
-    directory: "/wsdl2kotlin-gradle-plugin/"
-    schedule:
-      interval: "weekly"
-      timezone: "Asia/Tokyo"
-      day: "friday"
-    groups:
-      kotlin:
-        patterns:
-          - "org.jetbrains.kotlin.jvm"
           - "org.jetbrains.kotlin:kotlin-stdlib"
 
   - package-ecosystem: "github-actions"
