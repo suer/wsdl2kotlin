@@ -15,6 +15,9 @@ updates:
           - "org.jetbrains.kotlin.jvm"
           - "org.jetbrains.kotlin:kotlin-bom"
           - "org.jetbrains.kotlin:kotlin-stdlib"
+      guava:
+        patterns:
+          - "com.google.guava:guava"
     ignore:
       - dependency-name: "org.codefirst.wsdl2kotlin:wsdl2kotlin"
 
