@@ -20,7 +20,7 @@ updates:
           - "com.google.guava:guava"
       ktlint:
         patterns:
-          - "com.pinterest.ktlint"
+          - "com.pinterest.ktlint:ktlint-cli"
     ignore:
       - dependency-name: "org.codefirst.wsdl2kotlin:wsdl2kotlin"
 
