@@ -18,6 +18,9 @@ updates:
       guava:
         patterns:
           - "com.google.guava:guava"
+      ktlint:
+        patterns:
+          - "com.pinterest:ktlint"
     ignore:
       - dependency-name: "org.codefirst.wsdl2kotlin:wsdl2kotlin"
 
