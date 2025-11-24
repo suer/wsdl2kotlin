@@ -116,13 +116,21 @@ abstract class XSDType {
     ): Array<Element> {
         val element = document.createElement(name)
         when (value) {
-            is java.util.Date -> element.textContent = SimpleDateFormat(DATETIME_FORMAT).format(value)
-            is ByteArray ->
+            is java.util.Date -> {
+                element.textContent = SimpleDateFormat(DATETIME_FORMAT).format(value)
+            }
+
+            is ByteArray -> {
                 element.textContent =
                     java.util.Base64
                         .getEncoder()
                         .encodeToString(value)
-            is Array<*> -> return value.map { xmlElements(it, name, document).first() }.toTypedArray()
+            }
+
+            is Array<*> -> {
+                return value.map { xmlElements(it, name, document).first() }.toTypedArray()
+            }
+
             is XSDType -> {
                 value.xmlParams().forEach { param ->
                     xmlElements(param.value, param.name, document).forEach { childElement ->
@@ -130,8 +138,14 @@ abstract class XSDType {
                     }
                 }
             }
-            null -> return arrayOf()
-            else -> element.textContent = value.toString()
+
+            null -> {
+                return arrayOf()
+            }
+
+            else -> {
+                element.textContent = value.toString()
+            }
         }
 
         return arrayOf(element)
@@ -215,16 +229,36 @@ abstract class XSDType {
         clazz: KClass<T>,
     ): T {
         return when (clazz) {
-            String::class -> item.textContent
-            Boolean::class -> item.textContent.equals("true", ignoreCase = true)
-            Int::class -> item.textContent.toInt()
-            Float::class -> item.textContent.toFloat()
-            Long::class -> item.textContent.toLong()
-            java.util.Date::class -> SimpleDateFormat(DATETIME_FORMAT).parse(item.textContent)
-            ByteArray::class ->
+            String::class -> {
+                item.textContent
+            }
+
+            Boolean::class -> {
+                item.textContent.equals("true", ignoreCase = true)
+            }
+
+            Int::class -> {
+                item.textContent.toInt()
+            }
+
+            Float::class -> {
+                item.textContent.toFloat()
+            }
+
+            Long::class -> {
+                item.textContent.toLong()
+            }
+
+            java.util.Date::class -> {
+                SimpleDateFormat(DATETIME_FORMAT).parse(item.textContent)
+            }
+
+            ByteArray::class -> {
                 java.util.Base64
                     .getDecoder()
                     .decode(item.textContent)
+            }
+
             else -> {
                 val t =
                     clazz.java.newInstance() as? XSDType
