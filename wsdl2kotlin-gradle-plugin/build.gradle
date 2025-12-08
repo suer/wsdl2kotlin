@@ -7,14 +7,13 @@ plugins {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
 }
 
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.2.21'
     implementation gradleApi()
-    implementation 'org.codefirst.wsdl2kotlin:wsdl2kotlin:0.7.0-SNAPSHOT'
+    implementation project(':wsdl2kotlin')
 }
 
 gradlePlugin {
