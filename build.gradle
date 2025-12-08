@@ -1,8 +1,35 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '2.2.21' apply false
+}
+
 subprojects {
+    group = 'org.codefirst.wsdl2kotlin'
+    version = '0.7.0-SNAPSHOT'
+
+    apply plugin: 'org.jetbrains.kotlin.jvm'
     apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
 
     repositories {
         mavenCentral()
+    }
+
+    java {
+        withSourcesJar()
+        withJavadocJar()
+    }
+
+    publishing {
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/suer/wsdl2kotlin")
+                credentials {
+                    username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                    password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+                }
+            }
+        }
     }
 
     configurations {
@@ -10,6 +37,11 @@ subprojects {
     }
 
     dependencies {
+        implementation platform('org.jetbrains.kotlin:kotlin-bom:2.2.21')
+        implementation 'org.jetbrains.kotlin:kotlin-stdlib'
+        testImplementation 'org.jetbrains.kotlin:kotlin-test'
+        testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
+
         ktlint "com.pinterest.ktlint:ktlint-cli:1.8.0"
     }
 
