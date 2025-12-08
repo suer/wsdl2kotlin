@@ -48,7 +48,7 @@ java {
     withJavadocJar()
 }
 
-group 'org.codefirst.wsdl2kotlin'
+group = 'org.codefirst.wsdl2kotlin'
 version = '0.7.0-SNAPSHOT'
 
 publishing {
