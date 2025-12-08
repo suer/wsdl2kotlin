@@ -27,17 +27,5 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: Run ktlint
-        run: ./gradlew ktlint
-      - name: Build wsdl2kotlin
-        run: |
-          cd wsdl2kotlin
-          ../gradlew test build publishToMavenLocal publish
-      - name: Build wsdl2kotlin-runtime
-        run: |
-          cd wsdl2kotlin-runtime
-          ../gradlew test build publish
-      - name: Build wsdl2kotlin-gradle-plugin
-        run: |
-          cd wsdl2kotlin-gradle-plugin
-          ../gradlew test build publish
+      - name: Publish all modules
+        run: ./gradlew publish

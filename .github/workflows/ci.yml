@@ -25,20 +25,8 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: Run ktlint
-        run: ./gradlew ktlint
-      - name: Build wsdl2kotlin
-        run: |
-          cd wsdl2kotlin
-          ../gradlew test build publishToMavenLocal
-      - name: Build wsdl2kotlin-runtime
-        run: |
-          cd wsdl2kotlin-runtime
-          ../gradlew test build
-      - name: Build wsdl2kotlin-gradle-plugin
-        run: |
-          cd wsdl2kotlin-gradle-plugin
-          ../gradlew test build
+      - name: Build and test all modules
+        run: ./gradlew build
       - name: Upload jar files
         uses: actions/upload-artifact@v5
         with:
