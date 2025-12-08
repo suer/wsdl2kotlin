@@ -20,10 +20,6 @@ repositories {
     mavenCentral()
 }
 
-configurations {
-    ktlint
-}
-
 dependencies {
     // Align versions of all Kotlin components
     implementation platform('org.jetbrains.kotlin:kotlin-bom:2.2.21')
@@ -42,8 +38,6 @@ dependencies {
 
     // Use the Kotlin JUnit integration.
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
-
-    ktlint "com.pinterest.ktlint:ktlint-cli:1.8.0"
 }
 
 java {
@@ -78,19 +72,4 @@ publishing {
             }
         }
     }
-}
-
-task ktlint(type: JavaExec, group: "verification") {
-    description = "Check Kotlin code style."
-    classpath = configurations.ktlint
-    mainClass = "com.pinterest.ktlint.Main"
-    args "src/**/*.kt"
-}
-check.dependsOn ktlint
-
-task ktlintFormat(type: JavaExec, group: "formatting") {
-    description = "Fix Kotlin code style deviations."
-    classpath = configurations.ktlint
-    mainClass = "com.pinterest.ktlint.Main"
-    args "-F", "src/**/*.kt"
 }
