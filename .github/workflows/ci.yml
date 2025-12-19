@@ -28,7 +28,7 @@ jobs:
       - name: Build and test all modules
         run: ./gradlew build
       - name: Upload jar files
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: jar
           path: |
