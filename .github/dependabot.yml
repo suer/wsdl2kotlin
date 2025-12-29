@@ -6,6 +6,8 @@ updates:
       - "/wsdl2kotlin/"
       - "/wsdl2kotlin-runtime/"
       - "/wsdl2kotlin-gradle-plugin/"
+    cooldown:
+      default-days: 3
     schedule:
       interval: "weekly"
       timezone: "Asia/Tokyo"
@@ -27,6 +29,8 @@ updates:
 
   - package-ecosystem: "github-actions"
     directory: "/"
+    cooldown:
+      default-days: 3
     schedule:
       interval: "weekly"
       timezone: "Asia/Tokyo"
