@@ -6,6 +6,8 @@ updates:
       - "/wsdl2kotlin/"
       - "/wsdl2kotlin-runtime/"
       - "/wsdl2kotlin-gradle-plugin/"
+    cooldown:
+      default-days: 3
     schedule:
       interval: "weekly"
       timezone: "Asia/Tokyo"
@@ -16,17 +18,13 @@ updates:
           - "org.jetbrains.kotlin.jvm"
           - "org.jetbrains.kotlin:kotlin-bom"
           - "org.jetbrains.kotlin:kotlin-stdlib"
-      guava:
-        patterns:
-          - "com.google.guava:guava"
-      ktlint:
-        patterns:
-          - "com.pinterest.ktlint:ktlint-cli"
     ignore:
       - dependency-name: "org.codefirst.wsdl2kotlin:wsdl2kotlin"
 
   - package-ecosystem: "github-actions"
     directory: "/"
+    cooldown:
+      default-days: 3
     schedule:
       interval: "weekly"
       timezone: "Asia/Tokyo"
