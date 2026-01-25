@@ -1,6 +1,6 @@
 dependencies {
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.20.1"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.21.0"
     implementation "com.github.ajalt.clikt:clikt:5.1.0"
 }
 
