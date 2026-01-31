@@ -4,7 +4,7 @@ plugins {
 
 subprojects {
     group = 'org.codefirst.wsdl2kotlin'
-    version = '0.7.0'
+    version = '0.8.0-SNAPSHOT'
 
     apply plugin: 'org.jetbrains.kotlin.jvm'
     apply plugin: 'java-library'
