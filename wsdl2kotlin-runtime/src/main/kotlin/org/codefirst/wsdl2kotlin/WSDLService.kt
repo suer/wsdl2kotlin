@@ -32,8 +32,6 @@ class SOAPFaultException(
     faultString: String,
 ) : RuntimeException(faultString)
 
-const val DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssX:00"
-
 class DocumentHelper {
     companion object {
         fun newDocumentBuilder(): DocumentBuilder =
@@ -66,6 +64,10 @@ class DocumentHelper {
 }
 
 abstract class XSDType {
+    companion object {
+        const val DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssX:00"
+    }
+
     abstract fun xmlParams(): Array<XMLParam>
 
     fun soapRequest(tns: String): Document {
