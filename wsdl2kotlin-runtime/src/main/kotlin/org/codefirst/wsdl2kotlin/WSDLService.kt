@@ -207,7 +207,7 @@ abstract class XSDType {
         }
 
         val t =
-            clazz.java.newInstance() as? XSDType
+            clazz.java.getDeclaredConstructor().newInstance() as? XSDType
                 ?: throw NotImplementedError("Unsupported type: ${clazz.simpleName}")
         val properties = t.javaClass.kotlin.memberProperties
 
@@ -261,7 +261,7 @@ abstract class XSDType {
 
             else -> {
                 val t =
-                    clazz.java.newInstance() as? XSDType
+                    clazz.java.getDeclaredConstructor().newInstance() as? XSDType
                         ?: throw NotImplementedError("Unsupported type: ${clazz.simpleName}")
                 t.readSOAPEnvelope(item as Element)
                 return t as T
@@ -320,7 +320,7 @@ abstract class WSDLService {
             throw SOAPFaultException(faultString)
         }
 
-        val o = O::class.java.newInstance()
+        val o = O::class.java.getDeclaredConstructor().newInstance()
         o.readSOAPEnvelope(bodyElement.firstChild as Element)
         return o
     }
