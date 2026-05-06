@@ -1,5 +1,5 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '2.3.21' apply false
+    alias(libs.plugins.kotlin.jvm) apply false
 }
 
 subprojects {
@@ -33,12 +33,12 @@ subprojects {
     }
 
     dependencies {
-        implementation platform('org.jetbrains.kotlin:kotlin-bom:2.3.21')
-        implementation 'org.jetbrains.kotlin:kotlin-stdlib'
-        testImplementation 'org.jetbrains.kotlin:kotlin-test'
-        testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
+        implementation platform(libs.kotlin.bom)
+        implementation libs.kotlin.stdlib
+        testImplementation libs.kotlin.test
+        testImplementation libs.kotlin.test.junit
 
-        ktlint "com.pinterest.ktlint:ktlint-cli:1.8.0"
+        ktlint libs.ktlint.cli
     }
 
     task ktlint(type: JavaExec, group: "verification") {
