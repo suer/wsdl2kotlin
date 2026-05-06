@@ -55,7 +55,7 @@ abstract class WSDLService {
                 }.build()
         val response = client.newCall(request).execute()
 
-        val document = DocumentHelper.newDocumentBuilder().parse(response.body?.byteStream())
+        val document = DocumentHelper.newDocumentBuilder().parse(response.body.byteStream())
         val bodyElement = DocumentHelper.getChildElementsByTagName(document.documentElement, "Body").first()
 
         val fault = DocumentHelper.getChildElementsByTagName(bodyElement, "Fault").firstOrNull()
