@@ -1,16 +1,15 @@
-WSDL2Kotlin
---------------------
+# WSDL2Kotlin
 
 A stub generator for services implemented by WSDL.
 
 Inspired by [WSDL2Swift](https://github.com/banjun/WSDL2Swift)
 
-# usage
+## Usage
 
-Add maven repository to `build.gradle`:
+Add maven repository to `settings.gradle`:
 
-```gradle:build.gradle
-buildscript {
+```gradle:settings.gradle
+pluginManagement {
     repositories {
         maven {
             name = "GitHubPackages"
@@ -20,15 +19,32 @@ buildscript {
                 password = project.findProperty("gpr.key") ?: System.getenv("TOKEN") ?: ""
             }
         }
+        gradlePluginPortal()
     }
 }
 
+dependencyResolutionManagement {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/suer/wsdl2kotlin")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME") ?: "suer"
+                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN") ?: ""
+            }
+        }
+        mavenCentral()
+    }
+}
 ```
 
-Then, add plugin configuration:
+Then, add plugin configuration to `build.gradle`:
 
 ```gradle:build.gradle
-apply plugin: 'org.codefirst.wsdl2kotlin.wsdl2kotlin-gradle-plugin'
+plugins {
+    id 'org.codefirst.wsdl2kotlin.wsdl2kotlin-gradle-plugin' version '0.7.0'
+}
+
 wsdl2kotlin {
     // path to WSDL and XSD files
     paths = ["app/src/test/resources/sample.wsdl.xml", "app/src/test/resources/sample.xsd.xml"]
@@ -51,23 +67,23 @@ dependencies {
 }
 ```
 
-# for developers
+## For developers
 
-## build
+### Build
 
 
 ```
 $ ./gradlew build
 ```
 
-## test
+### Test
 
 
 ```
 $ ./gradlew test
 ```
 
-## lint
+### Lint
 
 check your source code:
 
@@ -80,4 +96,3 @@ format all source code automatically:
 ```
 $ ./gradlew ktFormat
 ```
-
