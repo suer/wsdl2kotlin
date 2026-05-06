@@ -11,6 +11,7 @@ Add maven repository to `settings.gradle`:
 ```gradle:settings.gradle
 pluginManagement {
     repositories {
+        gradlePluginPortal()
         maven {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/suer/wsdl2kotlin")
@@ -19,12 +20,12 @@ pluginManagement {
                 password = project.findProperty("gpr.key") ?: System.getenv("TOKEN") ?: ""
             }
         }
-        gradlePluginPortal()
     }
 }
 
 dependencyResolutionManagement {
     repositories {
+        mavenCentral()
         maven {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/suer/wsdl2kotlin")
@@ -33,7 +34,6 @@ dependencyResolutionManagement {
                 password = project.findProperty("gpr.key") ?: System.getenv("TOKEN") ?: ""
             }
         }
-        mavenCentral()
     }
 }
 ```
