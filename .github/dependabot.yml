@@ -3,9 +3,6 @@ updates:
   - package-ecosystem: "gradle"
     directories:
       - "/"
-      - "/wsdl2kotlin/"
-      - "/wsdl2kotlin-runtime/"
-      - "/wsdl2kotlin-gradle-plugin/"
     cooldown:
       default-days: 3
     schedule:

@@ -1,9 +1,9 @@
 dependencies {
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
-    implementation 'org.jetbrains.kotlin:kotlin-reflect'
-    implementation 'com.squareup.okhttp3:okhttp:5.3.2'
+    implementation libs.kotlin.reflect
+    implementation libs.okhttp
 
-    testImplementation 'com.github.tomakehurst:wiremock-standalone:3.0.1'
+    testImplementation libs.wiremock.standalone
 }
 
 publishing {
