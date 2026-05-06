@@ -1,5 +1,11 @@
 rootProject.name = 'wsdl2kotlin'
 
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+    }
+}
+
 include('wsdl2kotlin')
 include('wsdl2kotlin-runtime')
 include('wsdl2kotlin-gradle-plugin')
