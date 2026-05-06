@@ -1,11 +1,10 @@
-WSDL2Kotlin
---------------------
+# WSDL2Kotlin
 
 A stub generator for services implemented by WSDL.
 
 Inspired by [WSDL2Swift](https://github.com/banjun/WSDL2Swift)
 
-# usage
+## Usage
 
 Add maven repository to `settings.gradle`:
 
@@ -68,23 +67,23 @@ dependencies {
 }
 ```
 
-# for developers
+## For developers
 
-## build
+### Build
 
 
 ```
 $ ./gradlew build
 ```
 
-## test
+### Test
 
 
 ```
 $ ./gradlew test
 ```
 
-## lint
+### Lint
 
 check your source code:
 
@@ -97,4 +96,3 @@ format all source code automatically:
 ```
 $ ./gradlew ktFormat
 ```
-
