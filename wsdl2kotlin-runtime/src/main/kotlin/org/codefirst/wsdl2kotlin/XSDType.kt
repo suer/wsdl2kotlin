@@ -119,6 +119,7 @@ abstract class XSDType {
             else -> false
         }
 
+    @Suppress("UNCHECKED_CAST")
     protected fun <T : Any> readSOAPEnvelopeFieldNullable(
         parentElement: Element,
         tagName: String,
@@ -178,6 +179,7 @@ abstract class XSDType {
         return t as T
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun <T : Any> singleNodeToObject(
         item: Node,
         clazz: KClass<T>,
