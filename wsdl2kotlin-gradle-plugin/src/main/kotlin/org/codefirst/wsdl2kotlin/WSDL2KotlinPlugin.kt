@@ -7,7 +7,7 @@ class WSDL2KotlinPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val extension = project.extensions.create("wsdl2kotlin", WSDL2KotlinPluginConfiguration::class.java)
 
-        project.task("wsdl2kotlin") {
+        project.tasks.register("wsdl2kotlin") {
             it.doLast {
                 val paths = extension.paths
                 val outputs = WSDL2Kotlin().run(*paths.toTypedArray())
