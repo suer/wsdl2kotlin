@@ -3,7 +3,9 @@ package org.codefirst.wsdl2kotlin
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
-import java.text.SimpleDateFormat
+import java.time.OffsetDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.memberProperties
@@ -17,7 +19,7 @@ data class XMLParam(
 
 abstract class XSDType {
     companion object {
-        const val DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssX:00"
+        val DATETIME_FORMATTER: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
     }
 
     abstract fun xmlParams(): Array<XMLParam>
@@ -71,7 +73,12 @@ abstract class XSDType {
         val element = document.createElement(name)
         when (value) {
             is java.util.Date -> {
-                element.textContent = SimpleDateFormat(DATETIME_FORMAT).format(value)
+                element.textContent =
+                    value
+                        .toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toOffsetDateTime()
+                        .format(DATETIME_FORMATTER)
             }
 
             is ByteArray -> {
@@ -206,7 +213,7 @@ abstract class XSDType {
             }
 
             java.util.Date::class -> {
-                SimpleDateFormat(DATETIME_FORMAT).parse(item.textContent)
+                java.util.Date.from(OffsetDateTime.parse(item.textContent, DATETIME_FORMATTER).toInstant())
             }
 
             ByteArray::class -> {
