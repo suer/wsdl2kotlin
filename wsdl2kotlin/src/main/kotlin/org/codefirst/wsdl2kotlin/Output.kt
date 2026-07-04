@@ -1,7 +1,6 @@
 package org.codefirst.wsdl2kotlin
 
 import java.io.File
-import java.nio.charset.Charset
 
 class Output(
     private val serviceName: String,
@@ -15,6 +14,6 @@ class Output(
         }
         val file = File(directory, "$serviceName.kt")
         println("Generating ${file.canonicalPath} ...")
-        file.writeText(code, Charset.forName("UTF-8"))
+        file.writeText(code, Charsets.UTF_8)
     }
 }
