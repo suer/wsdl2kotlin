@@ -106,12 +106,10 @@ class WSDLDefinitions {
                 .joinToString(".")
 }
 
-class WSDL {
-    companion object {
-        fun parse(path: String): WSDLDefinitions {
-            val xmlMapper = XmlMapper()
-            xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            return xmlMapper.readValue(File(path), WSDLDefinitions::class.java)
-        }
+object WSDL {
+    fun parse(path: String): WSDLDefinitions {
+        val xmlMapper = XmlMapper()
+        xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        return xmlMapper.readValue(File(path), WSDLDefinitions::class.java)
     }
 }
