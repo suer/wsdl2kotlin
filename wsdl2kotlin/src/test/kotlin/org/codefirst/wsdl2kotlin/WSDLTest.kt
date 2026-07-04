@@ -8,13 +8,13 @@ class WSDLTest {
     fun testParse() {
         val path = this::class.java.getResource("/sample.wsdl.xml").file
         val wsdl = WSDL.parse(path)
-        assertEquals(wsdl.service.name, "SampleService")
+        assertEquals("SampleService", wsdl.service.name)
     }
 
     @Test
     fun testPackageName() {
         val path = this::class.java.getResource("/sample.wsdl.xml").file
         val wsdl = WSDL.parse(path)
-        assertEquals(wsdl.packageName, "org.codefirst.sample.service")
+        assertEquals("org.codefirst.sample.service", wsdl.packageName)
     }
 }
