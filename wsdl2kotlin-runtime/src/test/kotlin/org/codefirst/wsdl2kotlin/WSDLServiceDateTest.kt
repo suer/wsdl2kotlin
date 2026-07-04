@@ -8,12 +8,25 @@ import com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import com.github.tomakehurst.wiremock.client.WireMock.verify
 import com.github.tomakehurst.wiremock.junit.WireMockRule
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.w3c.dom.Element
-import java.text.SimpleDateFormat
+import java.time.OffsetDateTime
+import java.time.ZoneId
+import java.util.Date
+import java.util.TimeZone
 import kotlin.test.assertEquals
+
+private fun parseDate(text: String): Date = Date.from(OffsetDateTime.parse(text).toInstant())
+
+private fun formatDate(date: Date): String =
+    date
+        .toInstant()
+        .atZone(ZoneId.systemDefault())
+        .toOffsetDateTime()
+        .format(XSDType.DATETIME_FORMATTER)
 
 class SampleServiceDate : WSDLService() {
     override val targetNamespace = "http://service.sample.codefirst.org/"
@@ -58,10 +71,8 @@ class WSDLServiceDateTest {
     @JvmField
     var wireMockRule = WireMockRule(18080)
 
-    private val dateFormat = SimpleDateFormat(XSDType.DATETIME_FORMAT)
-
-    private val requestDate = dateFormat.parse("2024-01-02T03:04:05+09:00")
-    private val responseDate = dateFormat.parse("2024-05-06T07:08:09+09:00")
+    private val requestDate = parseDate("2024-01-02T03:04:05+09:00")
+    private val responseDate = parseDate("2024-05-06T07:08:09+09:00")
 
     @Before
     fun setup() {
@@ -69,7 +80,7 @@ class WSDLServiceDateTest {
             """<?xml version='1.0' encoding='UTF-8'?>
             |<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
             |<S:Body><ns2:echoDateResponse xmlns:ns2="http://service.sample.codefirst.org/">
-            |<return>${dateFormat.format(responseDate)}</return></ns2:echoDateResponse></S:Body>
+            |<return>${formatDate(responseDate)}</return></ns2:echoDateResponse></S:Body>
             |</S:Envelope>
             """.trimMargin()
 
@@ -93,7 +104,89 @@ class WSDLServiceDateTest {
 
         verify(
             postRequestedFor(urlEqualTo("/service"))
-                .withRequestBody(containing(dateFormat.format(requestDate))),
+                .withRequestBody(containing(formatDate(requestDate))),
         )
+    }
+}
+
+/**
+ * Verifies that half-hour timezone offsets such as +09:30 are preserved end-to-end,
+ * now that XSDType uses OffsetDateTime + DateTimeFormatter.ISO_OFFSET_DATE_TIME instead
+ * of the old SimpleDateFormat-based DATETIME_FORMAT (which hardcoded the minute offset to "00").
+ */
+class WSDLServiceDateHalfHourOffsetTest {
+    @Rule
+    @JvmField
+    var wireMockRule = WireMockRule(18080)
+
+    private lateinit var originalTimeZone: TimeZone
+
+    @Before
+    fun setup() {
+        originalTimeZone = TimeZone.getDefault()
+        // Australia/Darwin is UTC+09:30 year-round with no daylight saving time
+        TimeZone.setDefault(TimeZone.getTimeZone("Australia/Darwin"))
+    }
+
+    @After
+    fun tearDown() {
+        TimeZone.setDefault(originalTimeZone)
+    }
+
+    @Test
+    fun testEchoDateSerializationPreservesHalfHourOffset() {
+        val requestDate = parseDate("2024-01-02T03:04:05+09:30")
+
+        val responseBody =
+            """<?xml version='1.0' encoding='UTF-8'?>
+            |<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+            |<S:Body><ns2:echoDateResponse xmlns:ns2="http://service.sample.codefirst.org/">
+            |<return>${formatDate(requestDate)}</return></ns2:echoDateResponse></S:Body>
+            |</S:Envelope>
+            """.trimMargin()
+
+        stubFor(
+            post(urlEqualTo("/service"))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "text/xml")
+                        .withBody(responseBody),
+                ),
+        )
+
+        val params = SampleService_echoDate()
+        params.arg0 = requestDate
+        SampleServiceDate().request(params)
+
+        verify(
+            postRequestedFor(urlEqualTo("/service"))
+                .withRequestBody(containing("2024-01-02T03:04:05+09:30")),
+        )
+    }
+
+    @Test
+    fun testEchoDateDeserializationPreservesHalfHourOffset() {
+        val expectedDate = parseDate("2024-01-02T03:04:05+09:30")
+
+        val responseBody =
+            """<?xml version='1.0' encoding='UTF-8'?>
+            |<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+            |<S:Body><ns2:echoDateResponse xmlns:ns2="http://service.sample.codefirst.org/">
+            |<return>2024-01-02T03:04:05+09:30</return></ns2:echoDateResponse></S:Body>
+            |</S:Envelope>
+            """.trimMargin()
+
+        stubFor(
+            post(urlEqualTo("/service"))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "text/xml")
+                        .withBody(responseBody),
+                ),
+        )
+
+        val response = SampleServiceDate().request(SampleService_echoDate())
+
+        assertEquals(expectedDate, response.`return`)
     }
 }
