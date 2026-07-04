@@ -145,33 +145,31 @@ class XSDElement {
     ): String = TypeResolver.baseTypeInKotlin(this.name, this.type, service, parentType)
 }
 
-private class TypeResolver {
-    companion object {
-        fun baseTypeInKotlin(
-            name: String,
-            type: String?,
-            service: WSDLService,
-            parentType: XSDComplexType?,
-        ): String {
-            if (type == null) {
-                return service.name + "_" + parentType?.name + "_" + name
-            }
+private object TypeResolver {
+    fun baseTypeInKotlin(
+        name: String,
+        type: String?,
+        service: WSDLService,
+        parentType: XSDComplexType?,
+    ): String {
+        if (type == null) {
+            return service.name + "_" + parentType?.name + "_" + name
+        }
 
-            if (type.startsWith("tns:")) {
-                return service.name + "_" + type.removePrefix("tns:")
-            }
+        if (type.startsWith("tns:")) {
+            return service.name + "_" + type.removePrefix("tns:")
+        }
 
-            return when (type.substringAfterLast(":")) {
-                "string" -> "String"
-                "boolean" -> "Boolean"
-                "byte" -> "Byte"
-                "int" -> "Int"
-                "float" -> "Float"
-                "long" -> "Long"
-                "dateTime" -> "java.util.Date"
-                "base64Binary" -> "ByteArray"
-                else -> ""
-            }
+        return when (type.substringAfterLast(":")) {
+            "string" -> "String"
+            "boolean" -> "Boolean"
+            "byte" -> "Byte"
+            "int" -> "Int"
+            "float" -> "Float"
+            "long" -> "Long"
+            "dateTime" -> "java.util.Date"
+            "base64Binary" -> "ByteArray"
+            else -> ""
         }
     }
 }
@@ -195,17 +193,15 @@ class XSDSchema {
         }
 }
 
-class XSD {
-    companion object {
-        fun parse(path: String): XSDSchema {
-            val xmlMapper = XmlMapper()
-            xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            return xmlMapper.readValue(File(path), XSDSchema::class.java)
-        }
+object XSD {
+    fun parse(path: String): XSDSchema {
+        val xmlMapper = XmlMapper()
+        xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        return xmlMapper.readValue(File(path), XSDSchema::class.java)
+    }
 
-        fun isXSD(path: String): Boolean {
-            val xsd = parse(path)
-            return xsd.elements.any()
-        }
+    fun isXSD(path: String): Boolean {
+        val xsd = parse(path)
+        return xsd.elements.any()
     }
 }

@@ -8,45 +8,43 @@ import javax.xml.transform.OutputKeys
 import javax.xml.transform.Transformer
 import javax.xml.transform.TransformerFactory
 
-class DocumentHelper {
-    companion object {
-        fun newDocumentBuilder(): DocumentBuilder =
-            DocumentBuilderFactory
-                .newInstance()
-                .apply {
-                    isNamespaceAware = true
-                    isXIncludeAware = false
-                    isExpandEntityReferences = false
-                    setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
-                    setFeature("http://xml.org/sax/features/external-general-entities", false)
-                    setFeature("http://xml.org/sax/features/external-parameter-entities", false)
-                    setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
-                    setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
-                }.newDocumentBuilder()
+object DocumentHelper {
+    fun newDocumentBuilder(): DocumentBuilder =
+        DocumentBuilderFactory
+            .newInstance()
+            .apply {
+                isNamespaceAware = true
+                isXIncludeAware = false
+                isExpandEntityReferences = false
+                setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+                setFeature("http://xml.org/sax/features/external-general-entities", false)
+                setFeature("http://xml.org/sax/features/external-parameter-entities", false)
+                setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
+                setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
+            }.newDocumentBuilder()
 
-        fun newTransformer(): Transformer =
-            TransformerFactory
-                .newInstance()
-                .apply {
-                    setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
-                }.newTransformer()
-                .apply {
-                    this.setOutputProperty(OutputKeys.INDENT, "yes")
-                }
-
-        fun getChildElementsByTagName(
-            parentElement: Element,
-            tagName: String,
-        ): List<Element> {
-            val items = parentElement.childNodes
-            val nodes = mutableListOf<Element>()
-            for (i in 0 until items.length) {
-                val item = items.item(i)
-                if (item.localName == tagName) {
-                    nodes.add(item as Element)
-                }
+    fun newTransformer(): Transformer =
+        TransformerFactory
+            .newInstance()
+            .apply {
+                setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
+            }.newTransformer()
+            .apply {
+                this.setOutputProperty(OutputKeys.INDENT, "yes")
             }
-            return nodes
+
+    fun getChildElementsByTagName(
+        parentElement: Element,
+        tagName: String,
+    ): List<Element> {
+        val items = parentElement.childNodes
+        val nodes = mutableListOf<Element>()
+        for (i in 0 until items.length) {
+            val item = items.item(i)
+            if (item.localName == tagName) {
+                nodes.add(item as Element)
+            }
         }
+        return nodes
     }
 }
