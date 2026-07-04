@@ -53,20 +53,20 @@ abstract class WSDLService {
                         builder.addInterceptor(it)
                     }
                 }.build()
-        val response = client.newCall(request).execute()
+        client.newCall(request).execute().use { response ->
+            val document = DocumentHelper.newDocumentBuilder().parse(response.body.byteStream())
+            val bodyElement = DocumentHelper.getChildElementsByTagName(document.documentElement, "Body").first()
 
-        val document = DocumentHelper.newDocumentBuilder().parse(response.body.byteStream())
-        val bodyElement = DocumentHelper.getChildElementsByTagName(document.documentElement, "Body").first()
+            val fault = DocumentHelper.getChildElementsByTagName(bodyElement, "Fault").firstOrNull()
+            if (fault != null) {
+                val faultString = fault.getElementsByTagName("faultstring").item(0).textContent
+                throw SOAPFaultException(faultString)
+            }
 
-        val fault = DocumentHelper.getChildElementsByTagName(bodyElement, "Fault").firstOrNull()
-        if (fault != null) {
-            val faultString = fault.getElementsByTagName("faultstring").item(0).textContent
-            throw SOAPFaultException(faultString)
+            val o = O::class.java.getDeclaredConstructor().newInstance()
+            o.readSOAPEnvelope(bodyElement.firstChild as Element)
+            return o
         }
-
-        val o = O::class.java.getDeclaredConstructor().newInstance()
-        o.readSOAPEnvelope(bodyElement.firstChild as Element)
-        return o
     }
 
     fun addInterceptor(interceptor: Interceptor) {
