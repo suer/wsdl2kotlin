@@ -10,9 +10,10 @@ class WSDL2KotlinPlugin : Plugin<Project> {
         project.tasks.register("wsdl2kotlin") {
             it.doLast {
                 val paths = extension.paths
+                val logger = Logger { message -> project.logger.lifecycle(message) }
                 val outputs = WSDL2Kotlin().run(*paths.toTypedArray())
-                outputs.forEach {
-                    it.save(extension.outputDirectory ?: ".")
+                outputs.forEach { output ->
+                    output.save(extension.outputDirectory ?: ".", logger)
                 }
             }
         }
