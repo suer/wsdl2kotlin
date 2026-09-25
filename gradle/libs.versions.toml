@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.4.20"
-jackson = "2.22.2"
+jackson = "2.22.3"
 clikt = "5.1.0"
 okhttp = "5.5.0"
 ktlint = "1.8.0"
