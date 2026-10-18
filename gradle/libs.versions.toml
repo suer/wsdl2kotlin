@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.4.20"
+kotlin = "2.4.21"
 jackson = "2.22.3"
 clikt = "5.1.0"
 okhttp = "5.5.0"
