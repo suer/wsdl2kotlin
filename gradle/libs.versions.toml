@@ -2,7 +2,7 @@
 kotlin = "2.4.21"
 jackson = "2.22.4"
 clikt = "5.1.0"
-okhttp = "5.5.0"
+okhttp = "5.5.1"
 ktlint = "1.8.0"
 wiremock = "3.0.1"
 
